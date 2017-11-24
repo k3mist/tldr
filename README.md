@@ -11,6 +11,8 @@
 
 [TLDR pages](https://tldr.sh)
 
+![Terminal](terminal.png)
+
 ## Install
 
 ```bash
