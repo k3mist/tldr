@@ -1,21 +1,21 @@
 package cache
 
 import (
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
+	"bitbucket.org/djr2/tldr/pages"
 	"bitbucket.org/djr2/tldr/platform"
 	"github.com/mitchellh/go-homedir"
 )
 
 var cacheDir string
-
-const repository = "https://raw.github.com/tldr-pages/tldr/master/pages/"
 
 func init() {
 	h, err := homedir.Dir()
@@ -45,7 +45,7 @@ func Find(name string, plat platform.Platform) *os.File {
 		return cached
 	}
 	cacher.platform = plat.String()
-	return cacher.create()
+	return cacher.save()
 }
 
 func Remove(name string, plat platform.Platform) {
@@ -56,6 +56,7 @@ func Remove(name string, plat platform.Platform) {
 type cacher struct {
 	platform string
 	name     string
+	page     *pages.Pages
 }
 
 func (c *cacher) platformDir() string {
@@ -66,12 +67,12 @@ func (c *cacher) file() string {
 	return c.platformDir() + "/" + c.name
 }
 
-func (c *cacher) url() string {
-	return repository + c.platform + "/" + c.name
+func (c *cacher) cmd() string {
+	return strings.TrimSuffix(c.name, `.md`)
 }
 
-func (c *cacher) cmd() string {
-	return strings.TrimRight(c.name, ".md")
+func (c *cacher) meta() string {
+	return c.platformDir() + "/" + c.cmd() + ".json"
 }
 
 func (c *cacher) search() *os.File {
@@ -97,35 +98,14 @@ func (c *cacher) find() *os.File {
 }
 
 func (c *cacher) download() io.ReadCloser {
-	log.Println("Retrieving:", c.url())
-	cnr, err := http.Get(c.url())
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-	if cnr.StatusCode != http.StatusOK {
-		log.Println("Problem getting:", c.cmd(), "Server Error:", cnr.StatusCode)
-
-		c.platform = platform.Actual().String()
-		log.Println("Trying by platform:", c.platform)
-
-		log.Println("Retrieving:", c.url())
-		pmr, err := http.Get(c.url())
-		if err != nil {
-			log.Println(err)
-			os.Exit(1)
-		}
-		if pmr.StatusCode != http.StatusOK {
-			log.Println("Problem getting:", c.cmd(), "Server Error:", pmr.StatusCode)
-			os.Exit(1)
-		}
-		c.createDir()
-		return pmr.Body
-	}
-	return cnr.Body
+	c.page = &pages.Pages{c.name, c.platform}
+	body := c.page.Body()
+	c.platform = c.page.Platform
+	c.createDir()
+	return body
 }
 
-func (c *cacher) create() *os.File {
+func (c *cacher) save() *os.File {
 	buf, err := ioutil.ReadAll(c.download())
 	if err != nil {
 		log.Println(err)
@@ -145,8 +125,40 @@ func (c *cacher) create() *os.File {
 		os.Exit(1)
 	}
 
-	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(ret), "\n")
+	c.saveMeta()
+	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(ret))
 	return c.search()
+}
+
+type meta struct {
+	Size    int64     `json:"size"`
+	Modtime time.Time `json:"modtime"`
+}
+
+func (c *cacher) saveMeta() {
+	info, err := c.search().Stat()
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+
+	file, err := os.Create(c.meta())
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+
+	j, err := json.Marshal(&meta{info.Size(), info.ModTime()})
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+
+	_, err = file.Write(j)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 }
 
 func (c *cacher) remove() {
