@@ -1,12 +1,12 @@
 package cache
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-
 	"strings"
 
 	"bitbucket.org/djr2/tldr/platform"
@@ -44,6 +44,7 @@ func Find(name string, plat platform.Platform) *os.File {
 	if cached != nil {
 		return cached
 	}
+	cacher.platform = plat.String()
 	return cacher.create()
 }
 
@@ -65,7 +66,23 @@ func (c *cacher) file() string {
 	return c.platformDir() + "/" + c.name
 }
 
+func (c *cacher) url() string {
+	return repository + c.platform + "/" + c.name
+}
+
+func (c *cacher) cmd() string {
+	return strings.TrimRight(c.name, ".md")
+}
+
 func (c *cacher) search() *os.File {
+	cached := c.find()
+	if cached == nil {
+		c.platform = platform.Actual().String()
+	}
+	return c.find()
+}
+
+func (c *cacher) find() *os.File {
 	for _, fileInfo := range c.readDir() {
 		if fileInfo.Name() == c.name {
 			file, err := os.Open(c.file())
@@ -79,20 +96,37 @@ func (c *cacher) search() *os.File {
 	return nil
 }
 
-func (c *cacher) create() *os.File {
-	url := repository + c.platform + "/" + c.name
-	log.Println("Retrieving:", url)
-	response, err := http.Get(url)
+func (c *cacher) download() io.ReadCloser {
+	log.Println("Retrieving:", c.url())
+	cnr, err := http.Get(c.url())
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
-	if response.StatusCode != http.StatusOK {
-		log.Println("Server Error:", response.StatusCode)
-		os.Exit(1)
-	}
+	if cnr.StatusCode != http.StatusOK {
+		log.Println("Problem getting:", c.cmd(), "Server Error:", cnr.StatusCode)
 
-	buf, err := ioutil.ReadAll(response.Body)
+		c.platform = platform.Actual().String()
+		log.Println("Trying by platform:", c.platform)
+
+		log.Println("Retrieving:", c.url())
+		pmr, err := http.Get(c.url())
+		if err != nil {
+			log.Println(err)
+			os.Exit(1)
+		}
+		if pmr.StatusCode != http.StatusOK {
+			log.Println("Problem getting:", c.cmd(), "Server Error:", pmr.StatusCode)
+			os.Exit(1)
+		}
+		c.createDir()
+		return pmr.Body
+	}
+	return cnr.Body
+}
+
+func (c *cacher) create() *os.File {
+	buf, err := ioutil.ReadAll(c.download())
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -116,7 +150,7 @@ func (c *cacher) create() *os.File {
 }
 
 func (c *cacher) remove() {
-	if c.name == "clearcache.md" {
+	if c.name == "clearall.md" {
 		if err := os.RemoveAll(cacheDir); err != nil {
 			log.Println(err)
 			os.Exit(1)
@@ -125,9 +159,8 @@ func (c *cacher) remove() {
 		os.Exit(0)
 	}
 
-	file := c.search()
-	if file == nil {
-		log.Println("Command:", strings.TrimRight(c.name, ".md"), "not cached")
+	if c.search() == nil {
+		log.Println("Command:", c.cmd(), "not cached", c.file())
 		os.Exit(1)
 	}
 
@@ -136,11 +169,11 @@ func (c *cacher) remove() {
 		os.Exit(1)
 	}
 
-	log.Println("Removed:", strings.TrimRight(c.name, ".md"), c.file())
+	log.Println("Removed:", c.cmd(), c.file())
 	os.Exit(0)
 }
 
-func (c *cacher) readDir() []os.FileInfo {
+func (c *cacher) createDir() {
 	_, err := os.Stat(c.platformDir())
 	if err != nil {
 		if err := os.Mkdir(c.platformDir(), 0700); err != nil {
@@ -148,7 +181,10 @@ func (c *cacher) readDir() []os.FileInfo {
 			os.Exit(1)
 		}
 	}
+}
 
+func (c *cacher) readDir() []os.FileInfo {
+	c.createDir()
 	srcDir, err := ioutil.ReadDir(c.platformDir())
 	if err != nil {
 		log.Println(err)

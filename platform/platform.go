@@ -1,6 +1,9 @@
 package platform
 
-import "flag"
+import (
+	"flag"
+	"runtime"
+)
 
 type Platform uint32
 
@@ -42,4 +45,18 @@ func Platforms() []string {
 		platforms = append(platforms, name)
 	}
 	return platforms
+}
+
+func Actual() Platform {
+	switch runtime.GOOS {
+	case `freebsd`, `netbsd`, `openbsd`, `plan9`, `linux`:
+		return LINUX
+	case `darwin`:
+		return OSX
+	case `solaris`:
+		return SUNOS
+	case `windows`:
+		return WINDOWS
+	}
+	return COMMON
 }

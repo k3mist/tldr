@@ -30,6 +30,7 @@ func Print(file *os.File) {
 
 	contents := string(b)
 	buf := bytes.Buffer{}
+	buf.WriteString("\n")
 	for _, line := range strings.Split(contents, "\n") {
 		var str string
 		if header.MatchString(line) {
@@ -56,5 +57,5 @@ func Print(file *os.File) {
 		}
 
 	}
-	fmt.Println(buf.String())
+	fmt.Println(buf.String() + color.Reset)
 }

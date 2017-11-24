@@ -29,11 +29,11 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 
 func init() {
 	flagSet = flag.NewFlagSet("", flag.ContinueOnError)
-	flagSet.String("p", "common", "Man page platform.\n\t  `platform` -- "+
+	flagSet.String("p", "common", "platform of the tldr page\n\t  `platform` -- "+
 		strings.Join(platform.Platforms(), ", "))
-	flagSet.String("c", "", "Clear cache for a man page.\n\t  `name` -- "+
-		"Use `clearcache` to clear entire cache.\n\t  -p is required if clearing cache for a specific platform.")
-	flagSet.String("debug", "disable", "Enables debugging.")
+	flagSet.String("c", "", "clear cache for a tldr page\n\t  `page` -- "+
+		"Use `clearall` to clear entire cache\n\t  -p is required if clearing cache for a specific platform")
+	flagSet.String("debug", "disable", "enables debug logging")
 	log.SetOutput(new(logWriter))
 }
 
@@ -44,8 +44,6 @@ func main() {
 }
 
 func tldr() error {
-	fmt.Print(Banner())
-
 	if err := flagSet.Parse(os.Args[1:]); err != nil {
 		return nil
 	}
@@ -57,6 +55,7 @@ func tldr() error {
 	}
 
 	if clear := flagSet.Lookup("c"); clear.Value.String() != "" {
+		banner()
 		cache.Remove(clear.Value.String(), platform.Parse(flagSet.Lookup("p")))
 		return nil
 	}
@@ -64,18 +63,19 @@ func tldr() error {
 	if len(flagSet.Args()) > 0 {
 		page.Print(cache.Find(flagSet.Arg(0), platform.Parse(flagSet.Lookup("p"))))
 	} else if len(os.Args[1:]) == 0 {
+		banner()
 		flagSet.Usage()
 	}
 
 	return nil
 }
 
-func Banner() string {
-	return "" +
+func banner() {
+	fmt.Print("" +
 		color.ColorNormal(color.Blue) + `   ___________   _____  _____  ` + "\n" +
 		color.ColorNormal(color.Cyan) + `  /__   __/  /  /  _  \/  _  \ ` + "\n" +
 		color.ColorNormal(color.Cyan) + `    /  / /  /  /  //  /  //  / ` + "\n" +
-		color.ColorNormal(color.Blue) + `   /  / /  /__/  //  /  / \  \ ` + "\n" +
-		color.ColorNormal(color.Cyan) + `  /__/ /_____/______/__/   \_/ ` +
-		color.ColorBold(color.White) + "https://tldr.sh\n\n" + color.Reset
+		color.ColorNormal(color.Blue) + `   /  / /  /__/  //  /  / \  \ ` + color.ColorBold(color.White) + "tldr.sh\n" +
+		color.ColorNormal(color.Cyan) + `  /__/ /_____/______/__/   \_/ ` + color.ColorBold(color.DarkGray) + "bitbucket.org/djr2/tldr\n\n" + color.Reset,
+	)
 }
