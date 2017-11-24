@@ -12,9 +12,9 @@
 
 ## Download
 
-[Linux](https://bitbucket.org/djr2/tldr/downloads/tldr-linux)
-[OS X](https://bitbucket.org/djr2/tldr/downloads/tldr-darwin)
-[Windows](https://bitbucket.org/djr2/tldr/downloads/tldr.exe)
+* [Linux](https://bitbucket.org/djr2/tldr/downloads/tldr-linux)
+* [OS X](https://bitbucket.org/djr2/tldr/downloads/tldr-darwin)
+* [Windows](https://bitbucket.org/djr2/tldr/downloads/tldr.exe)
 
 ## Usage
 
