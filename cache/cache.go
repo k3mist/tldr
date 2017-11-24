@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
@@ -42,6 +41,15 @@ func Find(name string, plat platform.Platform) *os.File {
 	cacher := newCacher(name, plat)
 	cached := cacher.search()
 	if cached != nil {
+		info, err := cached.Stat()
+		if err != nil {
+			log.Println(err)
+			os.Exit(1)
+		}
+		if info.ModTime().Add(time.Hour * 120).Before(time.Now()) {
+			log.Println("Cache older than 5 days")
+			return cacher.save()
+		}
 		return cached
 	}
 	cacher.platform = plat.String()
@@ -125,40 +133,8 @@ func (c *cacher) save() *os.File {
 		os.Exit(1)
 	}
 
-	c.saveMeta()
 	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(ret))
 	return c.search()
-}
-
-type meta struct {
-	Size    int64     `json:"size"`
-	Modtime time.Time `json:"modtime"`
-}
-
-func (c *cacher) saveMeta() {
-	info, err := c.search().Stat()
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-
-	file, err := os.Create(c.meta())
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-
-	j, err := json.Marshal(&meta{info.Size(), info.ModTime()})
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-
-	_, err = file.Write(j)
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
 }
 
 func (c *cacher) remove() {
