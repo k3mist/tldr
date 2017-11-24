@@ -10,6 +10,12 @@
 # go get -u bitbucket.org/djr2/tldr
 ```
 
+## Download
+
+[Linux](https://bitbucket.org/djr2/tldr/downloads/tldr-linux)
+[OS X](https://bitbucket.org/djr2/tldr/downloads/tldr-darwin)
+[Windows](https://bitbucket.org/djr2/tldr/downloads/tldr.exe)
+
 ## Usage
 
 ```
@@ -27,17 +33,17 @@ Usage:
 
 ### View a tldr
 ```
-# tldr <page> 
+# tldr <page>
 ```
 
 ### View a tldr for a specific platform
 ```
-# tldr -p osx <page> 
+# tldr -p osx <page>
 ```
 
 ### Clear a tldr
 ```
-# tldr -c <page> 
+# tldr -c <page>
 ```
 
 ### Clear a tldr for a specific platform
