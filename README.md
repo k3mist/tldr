@@ -40,7 +40,7 @@ Usage:
 # tldr -c <page> 
 ```
 
-### View a tldr for a specific platform
+### Clear a tldr for a specific platform
 ```
 # tldr -c <page> -p osx
 ```
