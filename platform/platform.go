@@ -33,12 +33,7 @@ func (p Platform) String() string {
 }
 
 func ParseFlag(p *flag.Flag) Platform {
-	for plat, name := range platformMap {
-		if p.Value.String() == name {
-			return plat
-		}
-	}
-	return UNKNOWN
+	return Parse(p.Value.String())
 }
 
 func Parse(p string) Platform {
@@ -53,6 +48,9 @@ func Parse(p string) Platform {
 func Platforms() []string {
 	var platforms []string
 	for _, name := range platformMap {
+		if name == `unknown` {
+			continue
+		}
 		platforms = append(platforms, name)
 	}
 	return platforms
