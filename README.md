@@ -6,8 +6,8 @@
 
 ## Install
 
-```bash
-# go get -u bitbucket.org/djr2/tldr
+```
+go get -u bitbucket.org/djr2/tldr
 ```
 
 ## Download
@@ -31,27 +31,27 @@ Usage:
 
 ### View a tldr
 ```
-# tldr <page>
+tldr <page>
 ```
 
 ### View a tldr for a specific platform
 ```
-# tldr -p osx <page>
+tldr -p osx <page>
 ```
 
 ### Clear a tldr
 ```
-# tldr -c <page>
+tldr -c <page>
 ```
 
 ### Clear a tldr for a specific platform
 ```
-# tldr -c <page> -p osx
+tldr -c <page> -p osx
 ```
 
 ### Clear entire cache
 ```
-# tldr -c clearall
+tldr -c clearall
 ```
 
 ## License
