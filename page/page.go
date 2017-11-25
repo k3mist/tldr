@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"bitbucket.org/djr2/tldr/color"
+	"bitbucket.org/djr2/tldr/platform"
 )
 
 type Page interface {
@@ -24,7 +25,7 @@ var (
 	varRx  = regexp.MustCompile(`{{([\w\s\\/~!@#$%^&*()\[\]:;"'<,>?.]+)}}`)
 )
 
-func NewPage(file *os.File) Page {
+func NewPage(file *os.File, plat platform.Platform) Page {
 	b, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
@@ -38,16 +39,18 @@ func NewPage(file *os.File) Page {
 	} else {
 		p = &pagev1{lines, &bytes.Buffer{}}
 	}
-	parse(p)
+	parse(p, plat)
 	return p
 }
 
-func parse(p Page) {
+func parse(p Page, plat platform.Platform) {
 	p.Write(to_b("\n"))
 	for i, line := range p.Lines() {
 		if i == 0 {
 			p.Write(to_b("  "))
 			p.Write(p.header())
+			p.Write(to_b(color.ColorBold(color.White) + " - "))
+			p.Write(to_b(color.Color(color.DarkGray) + plat.String()))
 			p.Write(to_b(color.ColorBold(color.White) + "]" + "\n"))
 			continue
 		}

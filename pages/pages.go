@@ -15,11 +15,11 @@ const (
 
 type Pages struct {
 	Name     string
-	Platform string
+	Platform platform.Platform
 }
 
 func (p *Pages) url() string {
-	return raw + p.Platform + "/" + p.Name
+	return raw + p.Platform.String() + "/" + p.Name
 }
 
 func (p *Pages) Zip() *http.Response {
@@ -28,7 +28,7 @@ func (p *Pages) Zip() *http.Response {
 		log.Fatal(err)
 	}
 	if zpr.StatusCode != http.StatusOK {
-		log.Fatal("Problem getting:", zip, "Server Error:", zpr.StatusCode)
+		log.Fatal("Problem getting: ", zip, " Server Error: ", zpr.StatusCode)
 	}
 	return zpr
 }
@@ -41,19 +41,7 @@ func (p *Pages) Body() io.ReadCloser {
 	}
 	if cnr.StatusCode != http.StatusOK {
 		log.Println("Problem getting:", p.Name, "Server Error:", cnr.StatusCode)
-
-		p.Platform = platform.Actual().String()
-		log.Println("Trying by platform:", p.Platform)
-
-		log.Println("Retrieving:", p.url())
-		pmr, err := http.Get(p.url())
-		if err != nil {
-			log.Fatal(err)
-		}
-		if pmr.StatusCode != http.StatusOK {
-			log.Fatal("Problem getting:", p.Platform, "Server Error:", pmr.StatusCode)
-		}
-		return pmr.Body
+		return nil
 	}
 	return cnr.Body
 }

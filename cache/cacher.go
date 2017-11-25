@@ -1,0 +1,159 @@
+package cache
+
+import (
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
+	"bitbucket.org/djr2/tldr/pages"
+	"bitbucket.org/djr2/tldr/platform"
+)
+
+type cacher struct {
+	plat platform.Platform
+	name string
+}
+
+func (c *cacher) platformDir() string {
+	return cacheDir + "/pages/" + c.plat.String()
+}
+
+func (c *cacher) file() string {
+	return c.platformDir() + "/" + c.name
+}
+
+func (c *cacher) cmd() string {
+	return strings.TrimSuffix(c.name, `.md`)
+}
+
+func (c *cacher) search() *os.File {
+	var tried []platform.Platform
+	c.plat = validPlatform(c.plat)
+	tried = append(tried, c.plat)
+	cached := c.find()
+	if cached == nil {
+		c.plat = platform.COMMON
+		tried = append(tried, c.plat)
+	}
+	cached = c.find()
+	if cached == nil {
+		cached = c.extendedSearch(tried)
+	}
+	if cached != nil {
+		info, err := cached.Stat()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if info.ModTime().Add(time.Hour * 720).Before(time.Now()) {
+			log.Println("Cache older than 30 days")
+			return c.save()
+		}
+	}
+	return cached
+}
+
+func (c *cacher) extendedSearch(tried []platform.Platform) *os.File {
+	for _, plat := range platform.Platforms() {
+		c.plat = validPlatform(platform.Parse(plat))
+		if file := c.find(); file != nil {
+			return file
+		}
+	}
+	for _, plat := range tried {
+		c.plat = plat
+		if file := c.save(); file != nil {
+			return file
+		}
+	}
+	return nil
+}
+
+func (c *cacher) find() *os.File {
+	for _, fileInfo := range c.readDir() {
+		if fileInfo.Name() == c.name {
+			file, err := os.Open(c.file())
+			if err != nil {
+				log.Fatal(err)
+			}
+			return file
+		}
+	}
+	return nil
+}
+
+func (c *cacher) download() io.ReadCloser {
+	page := &pages.Pages{c.name, c.plat}
+	body := page.Body()
+	c.plat = page.Platform
+	c.createDir()
+	return body
+}
+
+func (c *cacher) save() *os.File {
+	down := c.download()
+	if down == nil {
+		return nil
+	}
+
+	buf, err := ioutil.ReadAll(c.download())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file, err := os.Create(c.file())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ret, err := file.Write(buf)
+	defer file.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(ret))
+	return c.search()
+}
+
+func (c *cacher) remove() {
+	if c.name == "clearall.md" {
+		if err := os.RemoveAll(cacheDir); err != nil {
+			log.Fatal(err)
+		}
+		log.Println("Cache cleared")
+		os.Exit(0)
+	}
+
+	if c.search() == nil {
+		log.Fatal("Command: ", c.cmd(), " not cached ", c.file())
+	}
+
+	if err := os.Remove(c.file()); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Removed:", c.cmd(), c.file())
+	os.Exit(0)
+}
+
+func (c *cacher) createDir() {
+	_, err := os.Stat(c.platformDir())
+	if err != nil {
+		if err := os.Mkdir(c.platformDir(), 0700); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func (c *cacher) readDir() []os.FileInfo {
+	c.createDir()
+	srcDir, err := ioutil.ReadDir(c.platformDir())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return srcDir
+}

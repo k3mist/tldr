@@ -8,7 +8,8 @@ import (
 type Platform uint32
 
 const (
-	COMMON Platform = iota
+	UNKNOWN Platform = iota
+	COMMON
 	LINUX
 	OSX
 	SUNOS
@@ -16,6 +17,7 @@ const (
 )
 
 var platformMap = map[Platform]string{
+	UNKNOWN: `unknown`,
 	COMMON:  `common`,
 	LINUX:   `linux`,
 	OSX:     `osx`,
@@ -27,16 +29,25 @@ func (p Platform) String() string {
 	if name, ok := platformMap[p]; ok {
 		return name
 	}
-	return COMMON.String()
+	return UNKNOWN.String()
 }
 
-func Parse(p *flag.Flag) Platform {
+func ParseFlag(p *flag.Flag) Platform {
 	for plat, name := range platformMap {
 		if p.Value.String() == name {
 			return plat
 		}
 	}
-	return COMMON
+	return UNKNOWN
+}
+
+func Parse(p string) Platform {
+	for plat, name := range platformMap {
+		if p == name {
+			return plat
+		}
+	}
+	return UNKNOWN
 }
 
 func Platforms() []string {

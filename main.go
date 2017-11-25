@@ -15,7 +15,7 @@ var flagSet *flag.FlagSet
 
 func init() {
 	flagSet = flag.NewFlagSet("", flag.ContinueOnError)
-	flagSet.String("p", "common", "platform of the tldr page\n\t  `platform` -- "+
+	flagSet.String("p", "", "platform of the tldr page\n\t  `platform` -- "+
 		strings.Join(platform.Platforms(), ", "))
 	flagSet.String("c", "", "clear cache for a tldr page\n\t  `page` -- "+
 		"Use `clearall` to clear entire cache\n\t  -p is required if clearing cache for a specific platform")
@@ -34,7 +34,7 @@ func tldr() {
 
 	setLogDebug()
 
-	plat := platform.Parse(flagSet.Lookup("p"))
+	plat := platform.ParseFlag(flagSet.Lookup("p"))
 
 	if clear := flagSet.Lookup("c"); clear.Value.String() != "" {
 		banner()
