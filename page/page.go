@@ -2,7 +2,6 @@ package page
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,50 +11,49 @@ import (
 	"bitbucket.org/djr2/tldr/color"
 )
 
-var (
-	header      = regexp.MustCompile(`^#\s`)
-	description = regexp.MustCompile(`^>\s`)
-	example     = regexp.MustCompile(`^-\s`)
-	codeStart   = regexp.MustCompile(`^.([a-z])`)
-	codeEnd     = regexp.MustCompile("`$")
-	variable    = regexp.MustCompile(`{{([\w\s\\/~!@#$%^&*()\[\]:;"'<,>?.]+)}}`)
+type parser uint32
+
+const (
+	v1 parser = iota
+	v2
 )
 
-func Print(file *os.File) {
+type Page interface {
+	Print()
+	header() string
+	example(line string) string
+	code(line string) string
+}
+
+var (
+	descRx = regexp.MustCompile(`^>\s`)
+	varRx  = regexp.MustCompile(`{{([\w\s\\/~!@#$%^&*()\[\]:;"'<,>?.]+)}}`)
+)
+
+func NewPage(file *os.File) Page {
 	b, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
-
-	contents := string(b)
-	buf := bytes.Buffer{}
-	buf.WriteString("\n")
-	for _, line := range strings.Split(contents, "\n") {
-		var str string
-		if header.MatchString(line) {
-			str = header.ReplaceAllString(line, color.ColorBold(color.White)+"["+color.ColorBold(color.Blue))
-			buf.WriteString("  " + str + color.ColorBold(color.White) + "]" + "\n")
-			continue
-		}
-		if description.MatchString(line) {
-			str = description.ReplaceAllString(line, color.Color(color.Normal))
-			buf.WriteString("  " + str + "\n")
-			continue
-		}
-		if example.MatchString(line) {
-			str = example.ReplaceAllString(line, color.Color(color.Normal)+"- "+color.ColorNormal(color.Cyan))
-			buf.WriteString("\n  " + str + "\n")
-			continue
-		}
-		if codeStart.MatchString(line) {
-			str = codeStart.ReplaceAllString(line, color.ColorNormal(color.Red)+"$1")
-			str = codeEnd.ReplaceAllString(str, "")
-			str = variable.ReplaceAllString(str, color.Color(color.Normal)+"$1"+color.ColorNormal(color.Red))
-			buf.WriteString("    " + str + "\n")
-			continue
-		}
-
+	parse := v1
+	contents := strings.Split(string(b), "\n")
+	if headerRxV.MatchString(contents[1]) {
+		parse = v2
+		contents[1] = contents[0]
+		contents = contents[1:]
+		return &pagev2{contents, &bytes.Buffer{}, parse}
 	}
-	fmt.Println(buf.String() + color.Reset)
+	return &pagev1{contents, &bytes.Buffer{}, parse}
+}
+
+func description(line string) string {
+	if descRx.MatchString(line) {
+		return descRx.ReplaceAllString(line, color.Color(color.Normal))
+	}
+	return ""
+}
+
+func variable(line string) string {
+	return varRx.ReplaceAllString(line, color.Color(color.Normal)+"$1"+color.ColorNormal(color.Red))
 }

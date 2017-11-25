@@ -2,30 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"bitbucket.org/djr2/tldr/cache"
-	"bitbucket.org/djr2/tldr/color"
 	"bitbucket.org/djr2/tldr/page"
 	"bitbucket.org/djr2/tldr/platform"
 )
 
 var flagSet *flag.FlagSet
-
-// Custom time format
-type logWriter struct{}
-
-// Write with custom time format.
-func (writer logWriter) Write(bytes []byte) (int, error) {
-	if flagSet.Lookup("debug").Value.String() != "disable" {
-		return fmt.Print("["+time.Now().UTC().Format("2006-01-02 15:04:05")+"] ", string(bytes))
-	}
-	return fmt.Print(string(bytes))
-}
 
 func init() {
 	flagSet = flag.NewFlagSet("", flag.ContinueOnError)
@@ -38,44 +24,28 @@ func init() {
 }
 
 func main() {
-	if err := tldr(); err != nil {
-		os.Exit(1)
-	}
+	tldr()
 }
 
-func tldr() error {
+func tldr() {
 	if err := flagSet.Parse(os.Args[1:]); err != nil {
-		return nil
+		return
 	}
 
-	if flagSet.Lookup("debug").Value.String() != "disable" {
-		log.SetFlags(log.Lshortfile)
-	} else {
-		log.SetFlags(0)
-	}
+	setLogDebug()
+
+	plat := platform.Parse(flagSet.Lookup("p"))
 
 	if clear := flagSet.Lookup("c"); clear.Value.String() != "" {
 		banner()
-		cache.Remove(clear.Value.String(), platform.Parse(flagSet.Lookup("p")))
-		return nil
+		cache.Remove(clear.Value.String(), plat)
+		return
 	}
 
 	if len(flagSet.Args()) > 0 {
-		page.Print(cache.Find(flagSet.Arg(0), platform.Parse(flagSet.Lookup("p"))))
+		page.NewPage(cache.Find(flagSet.Arg(0), plat)).Print()
 	} else if len(os.Args[1:]) == 0 {
 		banner()
 		flagSet.Usage()
 	}
-
-	return nil
-}
-
-func banner() {
-	fmt.Print("" +
-		color.Color(color.Blue) + `   ___________   _____  _____  ` + "\n" +
-		color.Color(color.Cyan) + `  /__   __/  /  /  _  \/  _  \ ` + "\n" +
-		color.Color(color.Cyan) + `    /  / /  /  /  //  /  //  / ` + "\n" +
-		color.Color(color.Blue) + `   /  / /  /__/  //  /  / \  \ ` + color.ColorBold(color.White) + "tldr.sh\n" +
-		color.Color(color.Cyan) + `  /__/ /_____/______/__/   \_/ ` + color.ColorBold(color.DarkGray) + "bitbucket.org/djr2/tldr\n\n" + color.Reset,
-	)
 }
