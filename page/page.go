@@ -38,7 +38,7 @@ func NewPage(file *os.File) Page {
 	}
 	parse := v1
 	contents := strings.Split(string(b), "\n")
-	if headerRxV.MatchString(contents[1]) {
+	if headerRxV2.MatchString(contents[1]) {
 		parse = v2
 		contents[1] = contents[0]
 		contents = contents[1:]
