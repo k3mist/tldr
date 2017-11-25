@@ -10,12 +10,12 @@ import (
 
 var (
 	headerRxV1  = regexp.MustCompile(`^#\s`)
-	exampleRxV1 = regexp.MustCompile(`^-\s`)
+	exampleRxV1 = regexp.MustCompile(`^(-\s)`)
 	codeRxV1    = regexp.MustCompile("^`(.+)`$")
 )
 
 type pagev1 struct {
-	lines []string
+	lines [][]byte
 	buf   *bytes.Buffer
 }
 
@@ -23,42 +23,50 @@ func (p *pagev1) Print() {
 	p.buf.WriteString("\n")
 	for i, line := range p.lines {
 		if i == 0 {
-			p.buf.WriteString("  " + p.header() + color.ColorBold(color.White) + "]" + "\n")
+			p.buf.Write(to_b("  "))
+			p.buf.Write(p.header())
+			p.buf.Write(to_b(color.ColorBold(color.White) + "]" + "\n"))
 			continue
 		}
 
-		if desc := description(line); desc != "" {
-			p.buf.WriteString("  " + desc + "\n")
+		if desc := description(line); desc != nil {
+			p.buf.Write(to_b("  "))
+			p.buf.Write(desc)
+			p.buf.Write(to_b("\n"))
 			continue
 		}
 
-		if example := p.example(line); example != "" {
-			p.buf.WriteString("\n  " + example + "\n")
+		if example := p.example(line); example != nil {
+			p.buf.Write(to_b("\n  "))
+			p.buf.Write(example)
+			p.buf.Write(to_b("\n"))
 			continue
 		}
 
-		if code := p.code(line); code != "" {
-			p.buf.WriteString("    " + variable(code) + "\n")
+		if code := p.code(line); code != nil {
+			p.buf.Write(to_b("    "))
+			p.buf.Write(variable(code))
+			p.buf.Write(to_b("\n"))
 			continue
 		}
 	}
 	fmt.Println(p.buf.String() + color.Reset)
 }
 
-func (p *pagev1) header() string {
-	return headerRxV1.ReplaceAllString(p.lines[0], color.ColorBold(color.White)+"["+color.ColorBold(color.Blue))
+func (p *pagev1) header() []byte {
+	return headerRxV1.ReplaceAll(p.lines[0], to_b(color.ColorBold(color.White)+"["+color.ColorBold(color.Blue)))
 }
 
-func (p *pagev1) example(line string) string {
-	if exampleRxV1.MatchString(line) {
-		return exampleRxV1.ReplaceAllString(line, color.Color(color.Normal)+"- "+color.ColorNormal(color.Cyan))
+func (p *pagev1) example(line []byte) []byte {
+	if exampleRxV1.Match(line) {
+		return exampleRxV1.ReplaceAll(line, to_b(color.Color(color.Normal)+"$1"+color.ColorNormal(color.Cyan)))
 	}
-	return ""
+	return nil
 }
 
-func (p *pagev1) code(line string) string {
-	if codeRxV1.MatchString(line) {
-		return codeRxV1.ReplaceAllString(line, color.ColorNormal(color.Red)+"$1")
+func (p *pagev1) code(line []byte) []byte {
+	if codeRxV1.Match(line) {
+		return codeRxV1.ReplaceAll(line, to_b(color.ColorNormal(color.Red)+"$1"))
 	}
-	return ""
+	return nil
 }

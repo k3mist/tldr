@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 
 	"bitbucket.org/djr2/tldr/color"
 )
@@ -27,8 +26,8 @@ func NewPage(file *os.File) Page {
 		os.Exit(1)
 	}
 	var p Page
-	lines := strings.Split(string(b), "\n")
-	if headerRxV2.MatchString(lines[1]) {
+	lines := bytes.Split(b, to_b("\n"))
+	if headerRxV2.Match(lines[1]) {
 		lines[1] = lines[0]
 		lines = lines[1:]
 		p = &pagev2{lines, &bytes.Buffer{}}
@@ -38,13 +37,17 @@ func NewPage(file *os.File) Page {
 	return p
 }
 
-func description(line string) string {
-	if descRx.MatchString(line) {
-		return descRx.ReplaceAllString(line, color.Color(color.Normal))
+func description(line []byte) []byte {
+	if descRx.Match(line) {
+		return descRx.ReplaceAll(line, to_b(color.Color(color.Normal)))
 	}
-	return ""
+	return nil
 }
 
-func variable(line string) string {
-	return varRx.ReplaceAllString(line, color.Color(color.Normal)+"$1"+color.ColorNormal(color.Red))
+func variable(line []byte) []byte {
+	return varRx.ReplaceAll(line, to_b(color.Color(color.Normal)+"$1"+color.ColorNormal(color.Red)))
+}
+
+func to_b(str string) []byte {
+	return []byte(str)
 }
