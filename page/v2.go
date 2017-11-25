@@ -19,43 +19,20 @@ type pagev2 struct {
 	buf   *bytes.Buffer
 }
 
+func (p *pagev2) Lines() [][]byte {
+	return p.lines
+}
+
+func (p *pagev2) Write(b []byte) {
+	p.buf.Write(b)
+}
+
 func (p *pagev2) Print() {
-	p.buf.WriteString("\n")
-	for i, line := range p.lines {
-		if i == 0 {
-			p.buf.Write(to_b("  "))
-			p.buf.Write(p.header())
-			p.buf.Write(p.lines[0])
-			p.buf.Write(to_b(color.ColorBold(color.White) + "]" + "\n"))
-			continue
-		}
-
-		if desc := description(line); desc != nil {
-			p.buf.Write(to_b("  "))
-			p.buf.Write(desc)
-			p.buf.Write(to_b("\n"))
-			continue
-		}
-
-		if example := p.example(line); example != nil {
-			p.buf.Write(to_b("\n  "))
-			p.buf.Write(example)
-			p.buf.Write(to_b("\n"))
-			continue
-		}
-
-		if code := p.code(line); code != nil {
-			p.buf.Write(to_b("    "))
-			p.buf.Write(variable(code))
-			p.buf.Write(to_b("\n"))
-			continue
-		}
-	}
 	fmt.Println(p.buf.String() + color.Reset)
 }
 
 func (p *pagev2) header() []byte {
-	return to_b(color.ColorBold(color.White) + "[" + color.ColorBold(color.Blue))
+	return append(to_b(color.ColorBold(color.White)+"["+color.ColorBold(color.Blue)), p.lines[0]...)
 }
 
 func (p *pagev2) example(line []byte) []byte {

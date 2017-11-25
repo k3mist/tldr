@@ -12,6 +12,11 @@ import (
 
 type Page interface {
 	Print()
+	Write(p []byte)
+	Lines() [][]byte
+	header() []byte
+	example(line []byte) []byte
+	code(line []byte) []byte
 }
 
 var (
@@ -34,7 +39,41 @@ func NewPage(file *os.File) Page {
 	} else {
 		p = &pagev1{lines, &bytes.Buffer{}}
 	}
+	parse(p)
 	return p
+}
+
+func parse(p Page) {
+	p.Write(to_b("\n"))
+	for i, line := range p.Lines() {
+		if i == 0 {
+			p.Write(to_b("  "))
+			p.Write(p.header())
+			p.Write(to_b(color.ColorBold(color.White) + "]" + "\n"))
+			continue
+		}
+
+		if desc := description(line); desc != nil {
+			p.Write(to_b("  "))
+			p.Write(desc)
+			p.Write(to_b("\n"))
+			continue
+		}
+
+		if example := p.example(line); example != nil {
+			p.Write(to_b("\n  "))
+			p.Write(example)
+			p.Write(to_b("\n"))
+			continue
+		}
+
+		if code := p.code(line); code != nil {
+			p.Write(to_b("    "))
+			p.Write(variable(code))
+			p.Write(to_b("\n"))
+			continue
+		}
+	}
 }
 
 func description(line []byte) []byte {
