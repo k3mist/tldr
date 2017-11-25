@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+GOOS=darwin go build -o ./dist/darwin/tldr
+GOOS=linux go build -o ./dist/linux/tldr
+GOOS=windows go build -o ./dist/windows/tldr.exe
