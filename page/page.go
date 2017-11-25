@@ -27,8 +27,7 @@ var (
 func NewPage(file *os.File) Page {
 	b, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	var p Page
 	lines := bytes.Split(b, to_b("\n"))

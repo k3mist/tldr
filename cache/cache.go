@@ -19,18 +19,18 @@ var cacheDir string
 func init() {
 	h, err := homedir.Dir()
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	cacheDir = h + "/" + ".tldr"
 
 	if _, err := os.Stat(cacheDir); err != nil {
 		if err := os.Mkdir(cacheDir, 0700); err != nil {
-			log.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 	}
+
+	getAssets()
 }
 
 func newCacher(name string, plat platform.Platform) *cacher {
@@ -43,11 +43,10 @@ func Find(name string, plat platform.Platform) *os.File {
 	if cached != nil {
 		info, err := cached.Stat()
 		if err != nil {
-			log.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
-		if info.ModTime().Add(time.Hour * 120).Before(time.Now()) {
-			log.Println("Cache older than 5 days")
+		if info.ModTime().Add(time.Hour * 720).Before(time.Now()) {
+			log.Println("Cache older than 30 days")
 			return cacher.save()
 		}
 		return cached
@@ -64,11 +63,10 @@ func Remove(name string, plat platform.Platform) {
 type cacher struct {
 	platform string
 	name     string
-	page     *pages.Pages
 }
 
 func (c *cacher) platformDir() string {
-	return cacheDir + "/" + c.platform
+	return cacheDir + "/pages/" + c.platform
 }
 
 func (c *cacher) file() string {
@@ -77,10 +75,6 @@ func (c *cacher) file() string {
 
 func (c *cacher) cmd() string {
 	return strings.TrimSuffix(c.name, `.md`)
-}
-
-func (c *cacher) meta() string {
-	return c.platformDir() + "/" + c.cmd() + ".json"
 }
 
 func (c *cacher) search() *os.File {
@@ -96,8 +90,7 @@ func (c *cacher) find() *os.File {
 		if fileInfo.Name() == c.name {
 			file, err := os.Open(c.file())
 			if err != nil {
-				log.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 			return file
 		}
@@ -106,9 +99,9 @@ func (c *cacher) find() *os.File {
 }
 
 func (c *cacher) download() io.ReadCloser {
-	c.page = &pages.Pages{c.name, c.platform}
-	body := c.page.Body()
-	c.platform = c.page.Platform
+	page := &pages.Pages{c.name, c.platform}
+	body := page.Body()
+	c.platform = page.Platform
 	c.createDir()
 	return body
 }
@@ -116,21 +109,18 @@ func (c *cacher) download() io.ReadCloser {
 func (c *cacher) save() *os.File {
 	buf, err := ioutil.ReadAll(c.download())
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	file, err := os.Create(c.file())
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	ret, err := file.Write(buf)
 	defer file.Close()
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(ret))
@@ -140,21 +130,18 @@ func (c *cacher) save() *os.File {
 func (c *cacher) remove() {
 	if c.name == "clearall.md" {
 		if err := os.RemoveAll(cacheDir); err != nil {
-			log.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 		log.Println("Cache cleared")
 		os.Exit(0)
 	}
 
 	if c.search() == nil {
-		log.Println("Command:", c.cmd(), "not cached", c.file())
-		os.Exit(1)
+		log.Fatal("Command:", c.cmd(), "not cached", c.file())
 	}
 
 	if err := os.Remove(c.file()); err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	log.Println("Removed:", c.cmd(), c.file())
@@ -165,8 +152,7 @@ func (c *cacher) createDir() {
 	_, err := os.Stat(c.platformDir())
 	if err != nil {
 		if err := os.Mkdir(c.platformDir(), 0700); err != nil {
-			log.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 	}
 }
@@ -175,8 +161,7 @@ func (c *cacher) readDir() []os.FileInfo {
 	c.createDir()
 	srcDir, err := ioutil.ReadDir(c.platformDir())
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	return srcDir
 }
