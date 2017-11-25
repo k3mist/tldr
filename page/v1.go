@@ -15,9 +15,8 @@ var (
 )
 
 type pagev1 struct {
-	lines  []string
-	buf    *bytes.Buffer
-	parser parser
+	lines []string
+	buf   *bytes.Buffer
 }
 
 func (p *pagev1) Print() {
