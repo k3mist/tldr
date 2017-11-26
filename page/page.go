@@ -18,7 +18,7 @@ type Page interface {
 	Lines() [][]byte
 	header() []byte
 	example(line []byte) []byte
-	code(line []byte) []byte
+	syntax(line []byte) []byte
 }
 
 var (
@@ -71,7 +71,7 @@ func parse(p Page, plat platform.Platform) {
 			continue
 		}
 
-		if code := p.code(line); code != nil {
+		if code := p.syntax(line); code != nil {
 			p.Write(to_b("    "))
 			p.Write(variable(code))
 			p.Write(to_b("\n"))

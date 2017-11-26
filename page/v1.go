@@ -12,7 +12,7 @@ import (
 var (
 	headerRxV1  = regexp.MustCompile(`^#\s`)
 	exampleRxV1 = regexp.MustCompile(`^(-\s)`)
-	codeRxV1    = regexp.MustCompile("^`(.+)`$")
+	syntaxRxV1  = regexp.MustCompile("^`(.+)`$")
 )
 
 type pagev1 struct {
@@ -45,10 +45,10 @@ func (p *pagev1) example(line []byte) []byte {
 	return nil
 }
 
-func (p *pagev1) code(line []byte) []byte {
-	if codeRxV1.Match(line) {
+func (p *pagev1) syntax(line []byte) []byte {
+	if syntaxRxV1.Match(line) {
 		cfg := config.Config
-		return codeRxV1.ReplaceAll(line, to_b(color.Color(cfg.SyntaxColor)+"$1"))
+		return syntaxRxV1.ReplaceAll(line, to_b(color.Color(cfg.SyntaxColor)+"$1"))
 	}
 	return nil
 }
