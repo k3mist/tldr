@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"bitbucket.org/djr2/tldr/config"
 	"bitbucket.org/djr2/tldr/platform"
 )
 
@@ -19,18 +20,30 @@ type Pages struct {
 }
 
 func (p *Pages) url() string {
-	return raw + p.Platform.String() + "/" + p.Name
+	var uri string
+	if config.Config.PagesURI != "" {
+		uri = config.Config.PagesURI
+	} else {
+		uri = raw
+	}
+	return uri + p.Platform.String() + "/" + p.Name
 }
 
-func (p *Pages) Zip() *http.Response {
-	zpr, err := http.Get(zip)
+func (p *Pages) Zip() io.ReadCloser {
+	var uri string
+	if config.Config.ZipURI != "" {
+		uri = config.Config.ZipURI
+	} else {
+		uri = zip
+	}
+	zpr, err := http.Get(uri)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if zpr.StatusCode != http.StatusOK {
 		log.Fatal("Problem getting: ", zip, " Server Error: ", zpr.StatusCode)
 	}
-	return zpr
+	return zpr.Body
 }
 
 func (p *Pages) Body() io.ReadCloser {

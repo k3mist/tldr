@@ -14,7 +14,7 @@ import (
 )
 
 func getAssets() {
-	zipFile := cacheDir + "/assets.zip"
+	zipFile := CacheDir + "/assets.zip"
 	if info, err := os.Stat(zipFile); err == nil {
 		if info.ModTime().Add(time.Hour * 720).After(time.Now()) {
 			return
@@ -24,7 +24,7 @@ func getAssets() {
 	page := pages.Pages{}
 	resp := page.Zip()
 
-	contents, err := ioutil.ReadAll(resp.Body)
+	contents, err := ioutil.ReadAll(resp)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func getAssets() {
 			log.Fatal(err)
 		}
 
-		fpath := filepath.Join(cacheDir, f.Name)
+		fpath := filepath.Join(CacheDir, f.Name)
 		filenames = append(filenames, fpath)
 
 		if f.FileInfo().IsDir() {

@@ -42,9 +42,9 @@ func Color(code int, flags ...int) string {
 }
 
 func ColorNormal(code int) string {
-	return "\033[" + strconv.Itoa(Normal) + ";" + strconv.Itoa(code) + "m"
+	return Color(code, Normal)
 }
 
 func ColorBold(code int) string {
-	return "\033[" + strconv.Itoa(Bold) + ";" + strconv.Itoa(code) + "m"
+	return Color(code, Bold)
 }

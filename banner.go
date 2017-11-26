@@ -4,14 +4,16 @@ import (
 	"fmt"
 
 	"bitbucket.org/djr2/tldr/color"
+	"bitbucket.org/djr2/tldr/config"
 )
 
 func banner() {
+	cfg := config.Config
 	fmt.Print("" +
-		color.Color(color.Blue) + `   ___________   _____  _____  ` + "\n" +
-		color.Color(color.Cyan) + `  /__   __/  /  /  _  \/  _  \ ` + "\n" +
-		color.Color(color.Cyan) + `    /  / /  /  /  //  /  //  / ` + "\n" +
-		color.Color(color.Blue) + `   /  / /  /__/  //  /  / \  \ ` + color.ColorBold(color.White) + "tldr.sh\n" +
-		color.Color(color.Cyan) + `  /__/ /_____/______/__/   \_/ ` + color.ColorBold(color.DarkGray) + "bitbucket.org/djr2/tldr\n\n" + color.Reset,
+		color.Color(cfg.BannerColor1) + `   ___________   _____  _____  ` + "\n" +
+		color.Color(cfg.BannerColor2) + `  /__   __/  /  /  _  \/  _  \ ` + "\n" +
+		color.Color(cfg.BannerColor2) + `    /  / /  /  /  //  /  //  / ` + "\n" +
+		color.Color(cfg.BannerColor1) + `   /  / /  /__/  //  /  / \  \ ` + "\n" +
+		color.Color(cfg.BannerColor2) + `  /__/ /_____/______/__/   \_/ ` + color.ColorBold(cfg.TLDRColor) + "tldr.sh\n\n" + color.Reset,
 	)
 }

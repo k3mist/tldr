@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"bitbucket.org/djr2/tldr/color"
+	"bitbucket.org/djr2/tldr/config"
 	"bitbucket.org/djr2/tldr/platform"
 )
 
@@ -44,14 +45,15 @@ func NewPage(file *os.File, plat platform.Platform) Page {
 }
 
 func parse(p Page, plat platform.Platform) {
+	cfg := config.Config
 	p.Write(to_b("\n"))
 	for i, line := range p.Lines() {
 		if i == 0 {
 			p.Write(to_b("  "))
 			p.Write(p.header())
-			p.Write(to_b(color.ColorBold(color.White) + " - "))
-			p.Write(to_b(color.Color(color.DarkGray) + plat.String()))
-			p.Write(to_b(color.ColorBold(color.White) + "]" + "\n"))
+			p.Write(to_b(color.ColorBold(cfg.HeaderDecorColor) + " - "))
+			p.Write(to_b(color.Color(cfg.PlatformColor) + plat.String()))
+			p.Write(to_b(color.ColorBold(cfg.HeaderDecorColor) + "]" + "\n"))
 			continue
 		}
 
@@ -79,14 +81,16 @@ func parse(p Page, plat platform.Platform) {
 }
 
 func description(line []byte) []byte {
+	cfg := config.Config
 	if descRx.Match(line) {
-		return descRx.ReplaceAll(line, to_b(color.Color(color.Normal)))
+		return descRx.ReplaceAll(line, to_b(color.Color(cfg.DescriptionColor)))
 	}
 	return nil
 }
 
 func variable(line []byte) []byte {
-	return varRx.ReplaceAll(line, to_b(color.Color(color.Normal)+"$1"+color.ColorNormal(color.Red)))
+	cfg := config.Config
+	return varRx.ReplaceAll(line, to_b(color.Color(cfg.VariableColor)+"$1"+color.Color(cfg.SyntaxColor)))
 }
 
 func to_b(str string) []byte {

@@ -19,7 +19,7 @@ type cacher struct {
 }
 
 func (c *cacher) platformDir() string {
-	return cacheDir + "/pages/" + c.plat.String()
+	return CacheDir + "/pages/" + c.plat.String()
 }
 
 func (c *cacher) file() string {
@@ -121,7 +121,7 @@ func (c *cacher) save() *os.File {
 
 func (c *cacher) remove() {
 	if c.name == "clearall.md" {
-		if err := os.RemoveAll(cacheDir); err != nil {
+		if err := os.RemoveAll(CacheDir); err != nil {
 			log.Fatal(err)
 		}
 		log.Println("Cache cleared")

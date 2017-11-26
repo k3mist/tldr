@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"bitbucket.org/djr2/tldr/color"
+	"bitbucket.org/djr2/tldr/config"
 )
 
 var (
@@ -32,19 +33,22 @@ func (p *pagev1) Print() {
 }
 
 func (p *pagev1) header() []byte {
-	return headerRxV1.ReplaceAll(p.lines[0], to_b(color.ColorBold(color.White)+"["+color.ColorBold(color.Blue)))
+	cfg := config.Config
+	return headerRxV1.ReplaceAll(p.lines[0], to_b(color.ColorBold(cfg.HeaderDecorColor)+"["+color.ColorBold(cfg.HeaderColor)))
 }
 
 func (p *pagev1) example(line []byte) []byte {
 	if exampleRxV1.Match(line) {
-		return exampleRxV1.ReplaceAll(line, to_b(color.Color(color.Normal)+"$1"+color.ColorNormal(color.Cyan)))
+		cfg := config.Config
+		return exampleRxV1.ReplaceAll(line, to_b(color.Color(cfg.HypenColor)+"$1"+color.Color(cfg.ExampleColor)))
 	}
 	return nil
 }
 
 func (p *pagev1) code(line []byte) []byte {
 	if codeRxV1.Match(line) {
-		return codeRxV1.ReplaceAll(line, to_b(color.ColorNormal(color.Red)+"$1"))
+		cfg := config.Config
+		return codeRxV1.ReplaceAll(line, to_b(color.Color(cfg.SyntaxColor)+"$1"))
 	}
 	return nil
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-var cacheDir string
+var CacheDir string
 
 func init() {
 	h, err := homedir.Dir()
@@ -16,10 +16,10 @@ func init() {
 		log.Fatal(err)
 	}
 
-	cacheDir = h + "/" + ".tldr"
+	CacheDir = h + "/" + ".tldr"
 
-	if _, err := os.Stat(cacheDir); err != nil {
-		if err := os.Mkdir(cacheDir, 0700); err != nil {
+	if _, err := os.Stat(CacheDir); err != nil {
+		if err := os.Mkdir(CacheDir, 0700); err != nil {
 			log.Fatal(err)
 		}
 	}
