@@ -28,6 +28,7 @@ var (
 
 func New(file *os.File, plat platform.Platform) Page {
 	b, err := ioutil.ReadAll(file)
+	defer file.Close()
 	if err != nil {
 		log.Fatal(err)
 	}

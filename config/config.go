@@ -41,6 +41,7 @@ func Load() {
 	}
 
 	file, err := os.Open(f)
+	defer file.Close()
 	if err != nil {
 		log.Println(err)
 		return
@@ -75,6 +76,7 @@ func create(f string) {
 	}
 
 	file, err := os.Create(f)
+	defer file.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,7 +87,6 @@ func create(f string) {
 	}
 
 	_, err = file.Write(j)
-	defer file.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
