@@ -17,12 +17,21 @@ const (
 type Pages struct {
 	Name     string
 	Platform platform.Platform
+	cfg      config.Variables
+}
+
+func New(name string, plat platform.Platform) *Pages {
+	return &Pages{
+		Name:     name,
+		Platform: plat,
+		cfg:      config.Config,
+	}
 }
 
 func (p *Pages) url() string {
 	var uri string
-	if config.Config.PagesURI != "" {
-		uri = config.Config.PagesURI
+	if p.cfg.PagesURI != "" {
+		uri = p.cfg.PagesURI
 	} else {
 		uri = raw
 	}
@@ -31,8 +40,8 @@ func (p *Pages) url() string {
 
 func (p *Pages) Zip() io.ReadCloser {
 	var uri string
-	if config.Config.ZipURI != "" {
-		uri = config.Config.ZipURI
+	if p.cfg.ZipURI != "" {
+		uri = p.cfg.ZipURI
 	} else {
 		uri = zip
 	}

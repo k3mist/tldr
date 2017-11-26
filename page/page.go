@@ -26,7 +26,7 @@ var (
 	varRx  = regexp.MustCompile(`{{([\w\s\\/~!@#$%^&*()\[\]:;"'<,>?.]+)}}`)
 )
 
-func NewPage(file *os.File, plat platform.Platform) Page {
+func New(file *os.File, plat platform.Platform) Page {
 	b, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)

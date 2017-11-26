@@ -86,11 +86,10 @@ func (c *cacher) find() *os.File {
 }
 
 func (c *cacher) download() io.ReadCloser {
-	page := &pages.Pages{c.name, c.plat}
-	body := page.Body()
+	page := pages.New(c.name, c.plat)
 	c.plat = page.Platform
 	c.createDir()
-	return body
+	return page.Body()
 }
 
 func (c *cacher) save() *os.File {
