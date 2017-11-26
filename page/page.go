@@ -71,9 +71,9 @@ func parse(p Page, plat platform.Platform) {
 			continue
 		}
 
-		if code := p.syntax(line); code != nil {
+		if syntax := p.syntax(line); syntax != nil {
 			p.Write(to_b("    "))
-			p.Write(variable(code))
+			p.Write(variable(syntax))
 			p.Write(to_b("\n"))
 			continue
 		}
