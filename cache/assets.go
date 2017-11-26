@@ -14,7 +14,7 @@ import (
 )
 
 func getAssets() {
-	zipFile := CacheDir + "/assets.zip"
+	zipFile := cacheDir + "/assets.zip"
 	if info, err := os.Stat(zipFile); err == nil {
 		if info.ModTime().Add(time.Hour * 720).After(time.Now()) {
 			return
@@ -35,51 +35,52 @@ func getAssets() {
 	}
 
 	_, err = file.Write(contents)
-	defer file.Close()
+	file.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var filenames []string
+	var fileNames []string
 
 	r, err := zip.OpenReader(zipFile)
+	defer r.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer r.Close()
 
 	for _, f := range r.File {
-		rc, err := f.Open()
+		df, err := f.Open()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fpath := filepath.Join(CacheDir, f.Name)
-		filenames = append(filenames, fpath)
+		filePath := filepath.Join(cacheDir, f.Name)
+		fileNames = append(fileNames, filePath)
 
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(fpath, os.ModePerm)
+			os.MkdirAll(filePath, os.ModePerm)
 		} else {
-			var fdir string
-			if lastIndex := strings.LastIndex(fpath, string(os.PathSeparator)); lastIndex > -1 {
-				fdir = fpath[:lastIndex]
+			var fileDir string
+			if lastIndex := strings.LastIndex(filePath, string(os.PathSeparator)); lastIndex > -1 {
+				fileDir = filePath[:lastIndex]
 			}
 
-			err = os.MkdirAll(fdir, os.ModePerm)
-			if err != nil {
-				log.Fatal(err)
-			}
-			f, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer f.Close()
-
-			_, err = io.Copy(f, rc)
+			err = os.MkdirAll(fileDir, os.ModePerm)
 			if err != nil {
 				log.Fatal(err)
 			}
 
+			f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			_, err = io.Copy(f, df)
+			if err != nil {
+				log.Fatal(err)
+			}
+			f.Close()
 		}
+		df.Close()
 	}
 }

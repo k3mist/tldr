@@ -28,7 +28,7 @@ type Variables struct {
 	VariableColor    int    `json:"variable_color"`
 }
 
-func init() {
+func Load() {
 	h, err := homedir.Dir()
 	if err != nil {
 		log.Fatal(err)

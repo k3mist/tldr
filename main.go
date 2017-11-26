@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"bitbucket.org/djr2/tldr/cache"
+	"bitbucket.org/djr2/tldr/config"
 	"bitbucket.org/djr2/tldr/page"
 	"bitbucket.org/djr2/tldr/platform"
 )
@@ -34,6 +35,7 @@ func tldr() {
 
 	setLogDebug()
 
+	config.Load()
 	plat := platform.ParseFlag(flagSet.Lookup("p"))
 
 	if clear := flagSet.Lookup("c"); clear.Value.String() != "" {
