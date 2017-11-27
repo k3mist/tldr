@@ -14,12 +14,14 @@ const (
 	raw = "https://raw.github.com/tldr-pages/tldr/master/pages/"
 )
 
+// Pages provides the retrieval of the TLDR assets and repository pages.
 type Pages struct {
 	Name     string
 	Platform platform.Platform
-	cfg      config.Variables
+	cfg      config.Options
 }
 
+// New creates a new Pages instance
 func New(name string, plat platform.Platform) *Pages {
 	return &Pages{
 		Name:     name,
@@ -38,6 +40,7 @@ func (p *Pages) url() string {
 	return uri + p.Platform.String() + "/" + p.Name
 }
 
+// Zip returns the result of the downloaded TLDR pages zip file.
 func (p *Pages) Zip() io.ReadCloser {
 	var uri string
 	if p.cfg.ZipURI != "" {
@@ -55,6 +58,8 @@ func (p *Pages) Zip() io.ReadCloser {
 	return zpr.Body
 }
 
+// Body returns the result of a http lookup from the main TLDR repository for a
+// TLDR page that was not found in the local cache.
 func (p *Pages) Body() io.ReadCloser {
 	log.Println("Retrieving:", p.url())
 	cnr, err := http.Get(p.url())

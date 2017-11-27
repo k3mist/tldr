@@ -33,6 +33,7 @@ const (
 	White        = 97
 )
 
+// Color creates ANSI color syntax for terminal output
 func Color(code int, flags ...int) string {
 	var strFlags []string
 	for _, f := range flags {
@@ -41,10 +42,7 @@ func Color(code int, flags ...int) string {
 	return "\033[" + strings.Join(strFlags, ";") + ";" + strconv.Itoa(code) + "m"
 }
 
-func ColorNormal(code int) string {
-	return Color(code, Normal)
-}
-
-func ColorBold(code int) string {
+// ColorBold is an alias for bold ANSI color formatting
+func ColorBold(code int) string { // nolint: golint
 	return Color(code, Bold)
 }

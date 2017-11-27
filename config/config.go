@@ -10,9 +10,11 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-var Config Variables
+// Config provides the configuration variables read from config.json
+var Config Options
 
-type Variables struct {
+// Options defines the available configuration options
+type Options struct {
 	PagesURI         string `json:"pages_uri"`
 	ZipURI           string `json:"zip_uri"`
 	BannerColor1     int    `json:"banner_color_1"`
@@ -28,6 +30,8 @@ type Variables struct {
 	VariableColor    int    `json:"variable_color"`
 }
 
+// Load looks for the config.json file in $HOME/.tldr. If the configuration
+// file is not found it will create one with the default configuration options.
 func Load() {
 	h, err := homedir.Dir()
 	if err != nil {
@@ -41,7 +45,7 @@ func Load() {
 	}
 
 	file, err := os.Open(f)
-	defer file.Close()
+	defer file.Close() // nolint: errcheck, megacheck
 	if err != nil {
 		log.Println(err)
 		return
@@ -59,7 +63,7 @@ func Load() {
 }
 
 func create(f string) {
-	vars := Variables{
+	vars := Options{
 		PagesURI:         "",
 		ZipURI:           "",
 		BannerColor1:     color.Cyan,
@@ -76,7 +80,7 @@ func create(f string) {
 	}
 
 	file, err := os.Create(f)
-	defer file.Close()
+	defer file.Close() // nolint: errcheck, megacheck
 	if err != nil {
 		log.Fatal(err)
 	}

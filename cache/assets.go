@@ -13,7 +13,7 @@ import (
 	"bitbucket.org/djr2/tldr/pages"
 )
 
-func getAssets() {
+func getAssets() { // nolint: gocyclo
 	zipFile := cacheDir + "/assets.zip"
 	if info, err := os.Stat(zipFile); err == nil {
 		if info.ModTime().Add(time.Hour * 720).After(time.Now()) {
@@ -35,30 +35,29 @@ func getAssets() {
 	}
 
 	_, err = file.Write(contents)
-	file.Close()
+	defer file.Close() // nolint: errcheck
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var fileNames []string
-
 	r, err := zip.OpenReader(zipFile)
-	defer r.Close()
+	defer r.Close() // nolint: errcheck, megacheck
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, f := range r.File {
-		df, err := f.Open()
-		if err != nil {
-			log.Fatal(err)
+		df, oerr := f.Open()
+		if oerr != nil {
+			log.Fatal(oerr)
 		}
 
 		filePath := filepath.Join(cacheDir, f.Name)
-		fileNames = append(fileNames, filePath)
-
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(filePath, os.ModePerm)
+			derr := os.MkdirAll(filePath, os.ModePerm)
+			if derr != nil {
+				log.Fatal(derr)
+			}
 		} else {
 			var fileDir string
 			if lastIndex := strings.LastIndex(filePath, string(os.PathSeparator)); lastIndex > -1 {
@@ -79,8 +78,12 @@ func getAssets() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			f.Close()
+			if err := f.Close(); err != nil {
+				log.Println(err)
+			}
 		}
-		df.Close()
+		if err := df.Close(); err != nil {
+			log.Println(err)
+		}
 	}
 }

@@ -38,11 +38,16 @@ func validPlatform(plat platform.Platform) platform.Platform {
 	return plat
 }
 
+// Find attempts to find the requested tldr page from the local cache. If a
+// local cache page is not found it will attempt to retrieve the page from
+// tldr pages repository
 func Find(name string, plat platform.Platform) (*os.File, platform.Platform) {
 	cacher := newCacher(name, validPlatform(plat))
 	return cacher.search(), cacher.plat
 }
 
+// Remove will delete a local tldr page from the cache or if `clearall` is
+// provided as the name it will remove all tldr pages from the cache.
 func Remove(name string, plat platform.Platform) {
 	cacher := newCacher(name, validPlatform(plat))
 	cacher.remove()

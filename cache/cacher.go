@@ -109,7 +109,7 @@ func (c *cacher) save() *os.File {
 	}
 
 	ret, err := file.Write(buf)
-	defer file.Close()
+	defer file.Close() // nolint: errcheck
 	if err != nil {
 		log.Fatal(err)
 	}
