@@ -120,7 +120,10 @@ func (c *cacher) save() *os.File {
 
 func (c *cacher) remove() {
 	if c.name == "clearall.md" {
-		if err := os.RemoveAll(cacheDir); err != nil {
+		if err := os.RemoveAll(cacheDir + "/pages"); err != nil {
+			log.Fatal(err)
+		}
+		if err := os.Remove(cacheDir + "/assets.zip"); err != nil {
 			log.Fatal(err)
 		}
 		log.Println("Cache cleared")

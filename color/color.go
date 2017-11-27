@@ -38,7 +38,7 @@ func Color(code int, flags ...int) string {
 	for _, f := range flags {
 		strFlags = append(strFlags, strconv.Itoa(f))
 	}
-	return "\033[" + strings.Join(strFlags, "") + ";" + strconv.Itoa(code) + "m"
+	return "\033[" + strings.Join(strFlags, ";") + ";" + strconv.Itoa(code) + "m"
 }
 
 func ColorNormal(code int) string {
