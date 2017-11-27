@@ -98,7 +98,7 @@ func (c *cacher) save() *os.File {
 		return nil
 	}
 
-	buf, err := ioutil.ReadAll(c.download())
+	buf, err := ioutil.ReadAll(down)
 	if err != nil {
 		log.Fatal(err)
 	}
