@@ -45,7 +45,8 @@ func tldr() {
 	}
 
 	if len(flagSet.Args()) > 0 {
-		page.New(cache.Find(flagSet.Arg(0), plat)).Print()
+		p := strings.Join(flagSet.Args(), "-")
+		page.New(cache.Find(p, plat)).Print()
 	} else if len(os.Args[1:]) == 0 {
 		banner()
 		flagSet.Usage()
