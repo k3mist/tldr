@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
-GOOS=darwin go build -o ./dist/darwin/tldr
-GOOS=linux go build -o ./dist/linux/tldr
-GOOS=windows go build -o ./dist/windows/tldr.exe
+dist_dir=./dist
+
+dists=(
+"darwin"
+"linux"
+"windows"
+)
+
+for dist in "${dists[@]}"
+do
+  build_dir=$dist_dir/build/$dist
+  if [[ "$dist" == "windows" ]]; then
+    build_file=$build_dir/tldr.exe
+  else
+    build_file=$build_dir/tldr
+  fi
+
+	GOOS=$dist GOARCH=amd64 go build -ldflags="-s -w" -o $build_file
+	upx --brute $build_file
+	tar -jcvf "$dist_dir/$dist.tar.bz2" $dist_dir/build/$dist
+	rm -rf $dist_dir/build
+done

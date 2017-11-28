@@ -14,6 +14,33 @@ go get -u bitbucket.org/djr2/tldr
 
 * [Distributions](https://bitbucket.org/djr2/tldr/src/master/dist/)
 
+## Building and Build Requirements
+
+* go
+* upx -- https://github.com/upx/upx
+* tar
+
+```
+bin/build
+```
+
+The build script will compile and compress all the binaries. Currently
+just darwin, linux, and windows.
+
+To a build a specific platform version run the below commands. Make
+sure to replace `[platform]` with the desired operating system to build
+the executable for.
+
+Supported Go build platforms and architectures can be found here;
+https://golang.org/doc/install/source#environment
+
+It is not necessary to run upx but it greatly reduces executable size.
+
+```bash
+GOOS=[platform] GOARCH=amd64 go build -ldflags="-s -w" -o tldr
+upx --brute tldr # executable compression
+```
+
 ## Usage
 
 ```
