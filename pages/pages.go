@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	zip = "https://tldr.sh/assets/tldr.zip"
-	raw = "https://raw.github.com/tldr-pages/tldr/master/pages/"
+	zip = "https://tldr-pages.github.io/assets/tldr.zip"
+	raw = "https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/"
 )
 
 // Pages provides the retrieval of the TLDR assets and repository pages.

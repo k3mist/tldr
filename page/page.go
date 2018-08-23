@@ -44,15 +44,18 @@ func New(file *os.File, plat platform.Platform) Page { // nolint: interfacer
 	lines := bytes.Split(b, toB("\n"))
 	if headerRxV2.Match(lines[1]) {
 		p := &pagev2{lines, &bytes.Buffer{}}
-		parse(p, plat)
+		Parse(p, plat)
 		return p
 	}
 	p := &pagev1{lines, &bytes.Buffer{}}
-	parse(p, plat)
+	Parse(p, plat)
 	return p
 }
 
-func parse(p Parser, plat platform.Platform) {
+// Parse takes a Parser interface and the current platform of the document
+// that is to be parsed and the parses the internal lines writing to the
+// internal buffer of the parser.
+func Parse(p Parser, plat platform.Platform) {
 	cfg := config.Config
 	p.Write(toB("\n"))
 	for i, line := range p.Lines() {

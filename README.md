@@ -1,6 +1,6 @@
 # tldr in golang
 
-[TLDR pages](https://tldr.sh) - Simplified and community-driven man pages
+[TLDR pages](https://tldr-pages.github.io/) - Simplified and community-driven man pages
 
 ![Terminal](terminal.png)
 
@@ -122,9 +122,9 @@ These can be used to test pages from a custom repository
 or any zip collection that follows the official TLDR directory format
 and file specification.
 
-Pages: `https://raw.github.com/tldr-pages/tldr/master/pages/`
+Pages: `https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/`
 
-Zip: `https://tldr.sh/assets/tldr.zip`
+Zip: `https://tldr-pages.github.io/assets/tldr.zip`
 
 To reset the configuration back to its defaults delete `config.json`
 and it will be recreated. Or copy and paste the configuration from
