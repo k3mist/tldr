@@ -122,7 +122,7 @@ These can be used to test pages from a custom repository
 or any zip collection that follows the official TLDR directory format
 and file specification.
 
-Pages: `https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/`
+Pages: `https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/`
 
 Zip: `https://tldr-pages.github.io/assets/tldr.zip`
 
