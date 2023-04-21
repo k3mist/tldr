@@ -7,7 +7,7 @@
 ## Install
 
 ```
-go get -u bitbucket.org/djr2/tldr
+go install bitbucket.org/djr2/tldr@latest
 ```
 
 ## Download
@@ -24,12 +24,19 @@ go get -u bitbucket.org/djr2/tldr
 bin/build
 ```
 
-The build script will compile and compress all the binaries. Currently
-just darwin, linux, and windows.
+The build script will compile and compress the tldr executables.
 
-To a build a specific platform version run the below commands. Make
-sure to replace `[platform]` with the desired operating system to build
-the executable for.
+The build script currently supports the following platforms and architectures;
+
+* darwin arm64
+* darwin amd64
+* linux arm64
+* linux amd64
+* windows amd64
+
+To a build a specific platform version run the below commands. 
+It is important to replace `[platform]` with the desired operating system and 
+`[arch]` with the desired platform architecture to build the executable correctly.
 
 Supported Go build platforms and architectures can be found here;
 https://golang.org/doc/install/source#environment
@@ -37,7 +44,7 @@ https://golang.org/doc/install/source#environment
 It is not necessary to run upx but it greatly reduces executable size.
 
 ```bash
-GOOS=[platform] GOARCH=amd64 go build -ldflags="-s -w" -o tldr
+GOOS=[platform] GOARCH=[arch] go build -ldflags="-s -w" -o tldr
 upx --brute tldr # executable compression
 ```
 
