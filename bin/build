@@ -3,22 +3,27 @@
 dist_dir=./dist
 
 dists=(
-"darwin"
-"linux"
-"windows"
+"darwin-amd64"
+"darwin-arm64"
+"linux-amd64"
+"linux-arm64"
+"windows-amd64"
 )
 
 for dist in "${dists[@]}"
 do
+  dist_os=$(echo $dist | awk -F '-' '{ print $1 }')
+  dist_arch=$(echo $dist | awk -F '-' '{ print $2 }')
   build_dir=$dist_dir/build/$dist
-  if [[ "$dist" == "windows" ]]; then
+
+  if [[ "$dist_os" == "windows" ]]; then
     build_file=$build_dir/tldr.exe
   else
     build_file=$build_dir/tldr
   fi
 
-	GOOS=$dist GOARCH=amd64 go build -ldflags="-s -w" -o $build_file
-	upx --brute $build_file
-	tar -jcvf "$dist_dir/$dist.tar.bz2" $dist_dir/build/$dist
-	rm -rf $dist_dir/build
+  GOOS=$dist_os GOARCH=$dist_arch go build -ldflags="-s -w" -o $build_file
+  upx --brute $build_file
+  tar -jcvf "$dist_dir/$dist.tar.bz2" $dist_dir/build/$dist
+  rm -rf $dist_dir/build
 done
