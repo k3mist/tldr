@@ -64,7 +64,11 @@ func Parse(p Parser, plat platform.Platform) {
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "["))
 			p.Write(p.Header())
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + " - "))
-			p.Write(toB(color.Color(cfg.PlatformColor) + plat.String()))
+			if plat == platform.Actual() || plat == platform.COMMON {
+				p.Write(toB(color.Color(cfg.PlatformColor) + plat.String()))
+			} else {
+				p.Write(toB(color.Color(cfg.PlatformAltColor) + plat.String()))
+			}
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "]\n"))
 			continue
 		}

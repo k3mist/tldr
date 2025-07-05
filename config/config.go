@@ -24,6 +24,7 @@ type Options struct {
 	HeaderColor      int    `json:"header_color"`
 	HeaderDecorColor int    `json:"header_decor_color"`
 	PlatformColor    int    `json:"platform_color"`
+	PlatformAltColor int    `json:"platform_alt_color"`
 	DescriptionColor int    `json:"description_color"`
 	ExampleColor     int    `json:"example_color"`
 	HypenColor       int    `json:"hypen_color"`
@@ -73,6 +74,7 @@ func create(f string) {
 		HeaderColor:      color.Blue,
 		HeaderDecorColor: color.White,
 		PlatformColor:    color.DarkGray,
+		PlatformAltColor: color.BrightPurple,
 		DescriptionColor: color.Normal,
 		ExampleColor:     color.Cyan,
 		HypenColor:       color.Normal,
