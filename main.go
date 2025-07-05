@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 	"strings"
+
+	"github.com/rsc/getopt"
 
 	"bitbucket.org/djr2/tldr/cache"
 	"bitbucket.org/djr2/tldr/config"
@@ -12,42 +13,86 @@ import (
 	"bitbucket.org/djr2/tldr/platform"
 )
 
-var flagSet *flag.FlagSet
+var flagSet *getopt.FlagSet
+
+var flagClear bool
+var flagPageClear string
+var flagPlatform string
+var flagPlatforms bool
+var flagLanguage string
+var flagVersion bool
 
 func init() {
-	flagSet = flag.NewFlagSet("", flag.ContinueOnError)
-	flagSet.String("p", "", "platform of the tldr page\n\t  `platform` -- "+
-		strings.Join(platform.Platforms(), ", "))
-	flagSet.String("c", "", "clear cache for a tldr page\n\t  `page` -- "+
-		"Use `clearall` to clear entire cache\n\t  -p is required if clearing cache for a specific platform")
-	flagSet.String("debug", "disable", "enables debug logging")
-	log.SetOutput(new(logWriter))
+	flagSet = getopt.NewFlagSet("", flag.ContinueOnError)
+
+	flagSet.BoolVar(&flagClear, "clear", false, "Clear the entire page cache")
+
+	flagSet.StringVar(&flagPageClear, "c", "", "Clear cache for a specific tldr `page`\n"+
+		"\t-p is required if clearing cache for a specific platform")
+
+	flagSet.StringVar(&flagPlatform, "p", "", "Platform of the desired tldr page.")
+	flagSet.Alias("p", "platform")
+
+	flagSet.BoolVar(&flagPlatforms, "platforms", false, "Display a list of available platforms")
+
+	// TODO add language support
+	flagSet.StringVar(&flagLanguage, "L", "", "The desired language for the tldr page. (WIP)")
+	flagSet.Alias("L", "language")
+
+	flagSet.BoolVar(&flagVersion, "version", false, "Display the version number")
+
+	flagSet.String("debug", "disable", "Enables debug logging")
+	flagSet.SetOutput(new(logWriter))
 }
 
 func main() {
+	config.Load()
+
+	if len(os.Args[1:]) == 0 {
+		banner()
+		flagSet.Usage()
+		return
+	}
+
 	tldr()
 }
 
 func tldr() {
-	if err := flagSet.Parse(os.Args[1:]); err != nil {
-		return
-	}
-
 	setLogDebug()
 
-	config.Load()
-	plat := platform.ParseFlag(flagSet.Lookup("p"))
+	var cmd string = os.Args[1]
+	var args []string
 
-	if clear := flagSet.Lookup("c"); clear.Value.String() != "" {
-		banner()
-		cache.Remove(clear.Value.String(), plat)
+	if strings.HasPrefix(cmd, "-") {
+		args = os.Args[1:]
+	} else {
+		args = os.Args[2:]
+	}
+
+	if err := flagSet.Parse(args); err != nil {
 		return
 	}
 
-	if len(flagSet.Args()) > 0 {
-		page.New(cache.Find(strings.Join(flagSet.Args(), "-"), plat)).Print()
-	} else if len(os.Args[1:]) == 0 {
+	if flagPlatforms {
+		platform.Print()
+		return
+	}
+
+	platform := platform.ParseFlag(flagPlatform)
+
+	if flagClear {
 		banner()
-		flagSet.Usage()
+		cache.Remove("clearall", platform)
+		return
+	}
+
+	if flagPageClear != "" {
+		banner()
+		cache.Remove(flagPageClear, platform)
+		return
+	}
+
+	if len(os.Args[1:]) > 0 {
+		page.New(cache.Find(cmd, platform)).Print()
 	}
 }

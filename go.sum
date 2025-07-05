@@ -1,2 +1,4 @@
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
+github.com/rsc/getopt v0.0.0-20170811000552-20be20937449 h1:X0nEEUOPBAnG5oJFoM0l28BlfL1u57QHsZemNtqi0uk=
+github.com/rsc/getopt v0.0.0-20170811000552-20be20937449/go.mod h1:WTfOHN51lH2Zo/uvB/C8p9eHhLlcyolyJVg8bkAjHpQ=
