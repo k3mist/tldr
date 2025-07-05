@@ -52,15 +52,23 @@ upx --brute tldr # executable compression
 
 ```
 Usage:
+  -L, --language string
+        The desired language for the tldr page.
   -c page
-      clear cache for a tldr page
-      page -- Use `clearall` to clear entire cache
-      -p is required if clearing cache for a specific platform
-  -debug string
-      enables debug logging (default "disable")
-  -p platform
-      platform of the tldr page
-      platform -- common, linux, osx, sunos, windows (default "common")
+        Clear cache for a specific tldr page.
+        -p is required if clearing cache for a specific platform.
+  --clear
+        Clear the entire page cache.
+  --debug string
+        Enables debug logging. (default "disable")
+  --help
+        This usage output.
+  -p, --platform string
+        Platform of the desired tldr page.
+  --platforms
+        Display a list of available platforms.
+  --version
+        Display the version number.
 ```
 
 ### View a tldr
@@ -70,7 +78,17 @@ tldr <page>
 
 ### View a tldr for a specific platform
 ```
-tldr -p osx <page>
+tldr <page> -p osx
+```
+
+### View a tldr for a specific language
+```
+tldr <page> -L en
+```
+
+### View a tldr for a specific language and platform
+```
+tldr <page> -L en -p osx
 ```
 
 ### Clear a tldr
@@ -83,8 +101,17 @@ tldr -c <page>
 tldr -c <page> -p osx
 ```
 
+### Clear a tldr for a specific language and platform
+```
+tldr -c <page> -L en -p osx
+```
+
 ### Clear entire cache
 ```
+tldr --clear
+
+or
+
 tldr -c clearall
 ```
 
@@ -106,12 +133,15 @@ Below is the default configuration.
 {
 "pages_uri": "",
 "zip_uri": "",
+"language": "en",
+"cache_expiration": 30,
 "banner_color_1": 36,
 "banner_color_2": 34,
 "tldr_color": 97,
 "header_color": 34,
 "header_decor_color": 97,
 "platform_color": 90,
+"platform_alt_color": 95,
 "description_color": 0,
 "example_color": 36,
 "hypen_color": 0,
