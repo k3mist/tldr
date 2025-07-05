@@ -15,11 +15,12 @@ import (
 
 type cacher struct {
 	plat platform.Platform
+	lang string
 	name string
 }
 
 func (c *cacher) platformDir() string {
-	return cacheDir + "/pages/" + c.plat.String()
+	return cacheDir + "/pages." + c.lang + "/" + c.plat.String()
 }
 
 func (c *cacher) file() string {
@@ -100,7 +101,7 @@ func (c *cacher) find() *os.File {
 }
 
 func (c *cacher) download() io.ReadCloser {
-	page := pages.New(c.name, c.plat)
+	page := pages.New(c.name, c.lang, c.plat)
 	c.plat = page.Platform
 	c.createDir()
 	return page.Body()

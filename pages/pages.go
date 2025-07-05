@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"bitbucket.org/djr2/tldr/config"
 	"bitbucket.org/djr2/tldr/platform"
@@ -17,14 +18,16 @@ const (
 // Pages provides the retrieval of the TLDR assets and repository pages.
 type Pages struct {
 	Name     string
+	Lang     string
 	Platform platform.Platform
 	cfg      config.Options
 }
 
 // New creates a new Pages instance
-func New(name string, plat platform.Platform) *Pages {
+func New(name string, lang string, plat platform.Platform) *Pages {
 	return &Pages{
 		Name:     name,
+		Lang:     lang,
 		Platform: plat,
 		cfg:      config.Config,
 	}
@@ -37,7 +40,10 @@ func (p *Pages) url() string {
 	} else {
 		uri = raw
 	}
-	return uri + p.Platform.String() + "/" + p.Name
+
+	uri = strings.TrimSuffix(uri, "/")
+
+	return uri + "." + p.Lang + "/" + p.Platform.String() + "/" + p.Name
 }
 
 // Zip returns the result of the downloaded TLDR pages zip file.

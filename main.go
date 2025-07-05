@@ -37,7 +37,7 @@ func init() {
 	flagSet.BoolVar(&flagPlatforms, "platforms", false, "Display a list of available platforms.")
 
 	// TODO add language support
-	flagSet.StringVar(&flagLanguage, "L", "", "The desired language for the tldr page. (WIP)")
+	flagSet.StringVar(&flagLanguage, "L", "", "The desired language for the tldr page.")
 	flagSet.Alias("L", "language")
 
 	flagSet.BoolVar(&flagVersion, "version", false, "Display the version number.")
@@ -88,21 +88,25 @@ func tldr() {
 	}
 
 	platform := platform.ParseFlag(flagPlatform)
+	var language string = flagLanguage
+	if language == "" {
+		language = config.Config.Language
+	}
 
 	if flagClear {
 		banner()
-		cache.Remove("clearall", platform)
+		cache.Remove("clearall", language, platform)
 		return
 	}
 
 	if flagPageClear != "" {
 		banner()
-		cache.Remove(flagPageClear, platform)
+		cache.Remove(flagPageClear, language, platform)
 		return
 	}
 
 	if len(os.Args[1:]) > 0 {
-		page.New(cache.Find(cmd, platform)).Print()
+		page.New(cache.Find(cmd, language, platform)).Print()
 	}
 }
 

@@ -35,7 +35,7 @@ var (
 
 // New creates a parsed TLDR page. It parsers the provided file and returns the
 // parsed TLDR page.
-func New(file *os.File, plat platform.Platform) Page { // nolint: interfacer
+func New(file *os.File, lang string, plat platform.Platform) Page { // nolint: interfacer
 	b, err := io.ReadAll(file)
 	defer file.Close() // nolint: errcheck
 	if err != nil {
@@ -44,18 +44,18 @@ func New(file *os.File, plat platform.Platform) Page { // nolint: interfacer
 	lines := bytes.Split(b, toB("\n"))
 	if headerRxV2.Match(lines[1]) {
 		p := &pagev2{lines, &bytes.Buffer{}}
-		Parse(p, plat)
+		Parse(p, lang, plat)
 		return p
 	}
 	p := &pagev1{lines, &bytes.Buffer{}}
-	Parse(p, plat)
+	Parse(p, lang, plat)
 	return p
 }
 
 // Parse takes a Parser interface and the current platform of the document
 // that is to be parsed and the parses the internal lines writing to the
 // internal buffer of the parser.
-func Parse(p Parser, plat platform.Platform) {
+func Parse(p Parser, lang string, plat platform.Platform) {
 	cfg := config.Config
 	p.Write(toB("\n"))
 	for i, line := range p.Lines() {
@@ -63,13 +63,22 @@ func Parse(p Parser, plat platform.Platform) {
 			p.Write(toB("  "))
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "["))
 			p.Write(p.Header())
+			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "]"))
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + " - "))
+			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "("))
 			if plat == platform.Actual() || plat == platform.COMMON {
 				p.Write(toB(color.Color(cfg.PlatformColor) + plat.String()))
 			} else {
 				p.Write(toB(color.Color(cfg.PlatformAltColor) + plat.String()))
 			}
-			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "]\n"))
+			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + ":"))
+			if lang == config.Config.Language {
+				p.Write(toB(color.Color(cfg.PlatformColor) + lang))
+			} else {
+				p.Write(toB(color.Color(cfg.PlatformAltColor) + lang))
+			}
+			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + ")\n"))
+			p.Write(toB("\n"))
 			continue
 		}
 
