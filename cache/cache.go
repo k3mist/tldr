@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/djr2/tldr/platform"
 )
 
+var configDir string
 var cacheDir string
 
 func init() {
@@ -17,7 +18,14 @@ func init() {
 		log.Fatal(err)
 	}
 
-	cacheDir = h + "/" + ".tldr"
+	configDir = h + "/" + ".tldr"
+	cacheDir = configDir + "/cache"
+
+	if _, err := os.Stat(configDir); err != nil {
+		if err := os.Mkdir(configDir, 0700); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	if _, err := os.Stat(cacheDir); err != nil {
 		if err := os.Mkdir(cacheDir, 0700); err != nil {
@@ -32,7 +40,7 @@ func newCacher(name string, plat platform.Platform) *cacher {
 	return &cacher{name: name + ".md", plat: plat}
 }
 
-func validPlatform(plat platform.Platform) platform.Platform {
+func getPlatform(plat platform.Platform) platform.Platform {
 	if plat == platform.UNKNOWN {
 		return platform.Actual()
 	}
@@ -43,13 +51,13 @@ func validPlatform(plat platform.Platform) platform.Platform {
 // local cache page is not found it will attempt to retrieve the page from
 // tldr pages repository
 func Find(name string, plat platform.Platform) (*os.File, platform.Platform) {
-	cacher := newCacher(name, validPlatform(plat))
+	cacher := newCacher(name, getPlatform(plat))
 	return cacher.search(), cacher.plat
 }
 
 // Remove will delete a local tldr page from the cache or if `clearall` is
 // provided as the name it will remove all tldr pages from the cache.
 func Remove(name string, plat platform.Platform) {
-	cacher := newCacher(name, validPlatform(plat))
+	cacher := newCacher(name, getPlatform(plat))
 	cacher.remove()
 }

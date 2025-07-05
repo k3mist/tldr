@@ -117,11 +117,11 @@ func write(name string, actual bool, buf bytes.Buffer) bytes.Buffer {
 	cfg := config.Config
 	buf.Write(toB("  "))
 	if actual {
-		buf.Write(toB(color.Color(cfg.HypenColor) + "> "))
+		buf.Write(toB(color.Color(cfg.HyphenColor) + "> "))
 		buf.Write(toB(color.Color(cfg.SyntaxColor) + name))
 		buf.Write(toB(color.Color(cfg.DescriptionColor) + " (detected)"))
 	} else {
-		buf.Write(toB(color.Color(cfg.HypenColor) + "- "))
+		buf.Write(toB(color.Color(cfg.HyphenColor) + "- "))
 		buf.Write(toB(color.Color(cfg.DescriptionColor) + name))
 	}
 	buf.Write(toB("\n"))

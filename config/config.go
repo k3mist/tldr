@@ -11,13 +11,15 @@ import (
 	"bitbucket.org/djr2/tldr/color"
 )
 
-// Config provides the configuration variables read from config.json
+// Config provides the configuration variables read from config.jsondirs
 var Config Options
 
 // Options defines the available configuration options
 type Options struct {
 	PagesURI         string `json:"pages_uri"`
 	ZipURI           string `json:"zip_uri"`
+	Language         string `json:"language"`
+	CacheExpiration  int    `json:"cache_expiration"`
 	BannerColor1     int    `json:"banner_color_1"`
 	BannerColor2     int    `json:"banner_color_2"`
 	TLDRColor        int    `json:"tldr_color"`
@@ -27,7 +29,7 @@ type Options struct {
 	PlatformAltColor int    `json:"platform_alt_color"`
 	DescriptionColor int    `json:"description_color"`
 	ExampleColor     int    `json:"example_color"`
-	HypenColor       int    `json:"hypen_color"`
+	HyphenColor      int    `json:"hyphen_color"`
 	SyntaxColor      int    `json:"syntax_color"`
 	VariableColor    int    `json:"variable_color"`
 }
@@ -68,6 +70,8 @@ func create(f string) {
 	vars := Options{
 		PagesURI:         "",
 		ZipURI:           "",
+		Language:         "en",
+		CacheExpiration:  30,
 		BannerColor1:     color.Cyan,
 		BannerColor2:     color.Blue,
 		TLDRColor:        color.White,
@@ -77,7 +81,7 @@ func create(f string) {
 		PlatformAltColor: color.BrightPurple,
 		DescriptionColor: color.Normal,
 		ExampleColor:     color.Cyan,
-		HypenColor:       color.Normal,
+		HyphenColor:      color.Normal,
 		SyntaxColor:      color.Red,
 		VariableColor:    color.Normal,
 	}

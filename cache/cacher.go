@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"bitbucket.org/djr2/tldr/config"
 	"bitbucket.org/djr2/tldr/pages"
 	"bitbucket.org/djr2/tldr/platform"
 )
@@ -31,43 +32,57 @@ func (c *cacher) cmd() string {
 
 func (c *cacher) search() *os.File {
 	var tried []platform.Platform
-	c.plat = validPlatform(c.plat)
+	c.plat = getPlatform(c.plat)
 	tried = append(tried, c.plat)
+
 	cached := c.find()
 	if cached == nil {
 		c.plat = platform.COMMON
 		tried = append(tried, c.plat)
 	}
+
 	cached = c.find()
 	if cached == nil {
 		cached = c.extendedSearch(tried)
 	}
+
 	if cached != nil {
 		info, err := cached.Stat()
 		if err != nil {
 			log.Fatal(err)
 		}
-		if info.ModTime().Add(time.Hour * 720).Before(time.Now()) {
+
+		var hours int
+		if expires := config.Config.CacheExpiration * 24; expires < 1 {
+			hours = 1
+		} else {
+			hours = expires
+		}
+
+		if info.ModTime().Add(time.Hour * time.Duration(hours)).Before(time.Now()) {
 			log.Println("Cache older than 30 days")
 			return c.save()
 		}
 	}
+
 	return cached
 }
 
 func (c *cacher) extendedSearch(tried []platform.Platform) *os.File {
 	for _, plat := range platform.Platforms() {
-		c.plat = validPlatform(platform.Parse(plat))
+		c.plat = getPlatform(platform.Parse(plat))
 		if file := c.find(); file != nil {
 			return file
 		}
 	}
+
 	for _, plat := range tried {
 		c.plat = plat
 		if file := c.save(); file != nil {
 			return file
 		}
 	}
+
 	return nil
 }
 
@@ -119,10 +134,7 @@ func (c *cacher) save() *os.File {
 
 func (c *cacher) remove() {
 	if c.name == "clearall.md" {
-		if err := os.RemoveAll(cacheDir + "/pages"); err != nil {
-			log.Fatal(err)
-		}
-		if err := os.Remove(cacheDir + "/assets.zip"); err != nil {
+		if err := os.RemoveAll(cacheDir); err != nil {
 			log.Fatal(err)
 		}
 		log.Println("Cache cleared")

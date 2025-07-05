@@ -52,7 +52,7 @@ func (p *pagev2) Description(line []byte) []byte {
 func (p *pagev2) Example(line []byte) []byte {
 	if exampleRxV2.Match(line) {
 		cfg := config.Config
-		return exampleRxV2.ReplaceAll(line, toB(color.Color(cfg.HypenColor)+"- $1"+color.Color(cfg.ExampleColor)))
+		return exampleRxV2.ReplaceAll(line, toB(color.Color(cfg.HyphenColor)+"- $1"+color.Color(cfg.ExampleColor)))
 	}
 	return nil
 }

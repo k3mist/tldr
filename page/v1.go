@@ -48,7 +48,7 @@ func (p *pagev1) Description(line []byte) []byte {
 func (p *pagev1) Example(line []byte) []byte {
 	if exampleRxV1.Match(line) {
 		cfg := config.Config
-		return exampleRxV1.ReplaceAll(line, toB(color.Color(cfg.HypenColor)+"$1"+color.Color(cfg.ExampleColor)))
+		return exampleRxV1.ReplaceAll(line, toB(color.Color(cfg.HyphenColor)+"$1"+color.Color(cfg.ExampleColor)))
 	}
 	return nil
 }
