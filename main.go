@@ -21,36 +21,43 @@ var flagPlatform string
 var flagPlatforms bool
 var flagLanguage string
 var flagVersion bool
+var flagHelp bool
 
 func init() {
 	flagSet = getopt.NewFlagSet("", flag.ContinueOnError)
 
-	flagSet.BoolVar(&flagClear, "clear", false, "Clear the entire page cache")
+	flagSet.BoolVar(&flagClear, "clear", false, "Clear the entire page cache.")
 
-	flagSet.StringVar(&flagPageClear, "c", "", "Clear cache for a specific tldr `page`\n"+
-		"\t-p is required if clearing cache for a specific platform")
+	flagSet.StringVar(&flagPageClear, "c", "", "Clear cache for a specific tldr `page`.\n"+
+		"\t-p is required if clearing cache for a specific platform.")
 
 	flagSet.StringVar(&flagPlatform, "p", "", "Platform of the desired tldr page.")
 	flagSet.Alias("p", "platform")
 
-	flagSet.BoolVar(&flagPlatforms, "platforms", false, "Display a list of available platforms")
+	flagSet.BoolVar(&flagPlatforms, "platforms", false, "Display a list of available platforms.")
 
 	// TODO add language support
 	flagSet.StringVar(&flagLanguage, "L", "", "The desired language for the tldr page. (WIP)")
 	flagSet.Alias("L", "language")
 
-	flagSet.BoolVar(&flagVersion, "version", false, "Display the version number")
+	flagSet.BoolVar(&flagVersion, "version", false, "Display the version number.")
 
-	flagSet.String("debug", "disable", "Enables debug logging")
+	flagSet.BoolVar(&flagHelp, "help", false, "This usage output.")
+
+	flagSet.String("debug", "disable", "Enables debug logging.")
 	flagSet.SetOutput(new(logWriter))
+}
+
+func usage() {
+	banner()
+	flagSet.Usage()
 }
 
 func main() {
 	config.Load()
 
 	if len(os.Args[1:]) == 0 {
-		banner()
-		flagSet.Usage()
+		usage()
 		return
 	}
 
@@ -60,16 +67,13 @@ func main() {
 func tldr() {
 	setLogDebug()
 
-	var cmd string = os.Args[1]
-	var args []string
-
-	if strings.HasPrefix(cmd, "-") {
-		args = os.Args[1:]
-	} else {
-		args = os.Args[2:]
+	var cmd, args = getCmdArgs()
+	if err := flagSet.Parse(args); err != nil {
+		return
 	}
 
-	if err := flagSet.Parse(args); err != nil {
+	if flagHelp {
+		usage()
 		return
 	}
 
@@ -100,4 +104,32 @@ func tldr() {
 	if len(os.Args[1:]) > 0 {
 		page.New(cache.Find(cmd, platform)).Print()
 	}
+}
+
+func getCmdArgs() (string, []string) {
+	var cmd string
+	var args []string
+
+	var cmds []string
+	var lastHyphen int = -1
+	for i, p := range os.Args[1:] {
+		if lastHyphen < 0 && !strings.HasPrefix(p, "-") {
+			cmds = append(cmds, p)
+		} else {
+			lastHyphen = i
+		}
+	}
+
+	cmd = strings.Join(cmds, "-")
+	if cmd == "" && strings.HasPrefix(os.Args[1], "-") {
+		cmd = os.Args[1]
+	}
+
+	if strings.HasPrefix(cmd, "-") {
+		args = os.Args[1:]
+	} else {
+		args = os.Args[2:]
+	}
+
+	return cmd, args
 }
