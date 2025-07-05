@@ -11,7 +11,7 @@ import (
 	"bitbucket.org/djr2/tldr/color"
 )
 
-// Config provides the configuration variables read from config.jsondirs
+// Config provides the configuration variables read from config.json
 var Config Options
 
 // Options defines the available configuration options
