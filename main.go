@@ -78,6 +78,11 @@ func tldr() {
 		return
 	}
 
+	if flagVersion {
+		version()
+		return
+	}
+
 	platform := platform.ParseFlag(flagPlatform)
 
 	if flagClear {

@@ -17,3 +17,11 @@ func banner() {
 		color.Color(cfg.BannerColor2) + `  /__/ /_____/______/__/   \_/ ` + color.ColorBold(cfg.TLDRColor) + "https://tldr.sh\n\n" + color.Reset,
 	)
 }
+
+func version() {
+	banner()
+	cfg := config.Config
+	fmt.Print(
+		color.Color(cfg.BannerColor1) + `  version: ` + color.ColorBold(cfg.TLDRColor) + "2.1.0" + color.Reset + "\n",
+	)
+}
