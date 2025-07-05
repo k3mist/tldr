@@ -2,7 +2,7 @@ package page
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"regexp"
@@ -36,7 +36,7 @@ var (
 // New creates a parsed TLDR page. It parsers the provided file and returns the
 // parsed TLDR page.
 func New(file *os.File, plat platform.Platform) Page { // nolint: interfacer
-	b, err := ioutil.ReadAll(file)
+	b, err := io.ReadAll(file)
 	defer file.Close() // nolint: errcheck
 	if err != nil {
 		log.Fatal(err)
@@ -65,7 +65,7 @@ func Parse(p Parser, plat platform.Platform) {
 			p.Write(p.Header())
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + " - "))
 			p.Write(toB(color.Color(cfg.PlatformColor) + plat.String()))
-			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "]" + "\n"))
+			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + "]\n"))
 			continue
 		}
 
