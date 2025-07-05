@@ -2,12 +2,13 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
-	"bitbucket.org/djr2/tldr/color"
 	"github.com/mitchellh/go-homedir"
+
+	"bitbucket.org/djr2/tldr/color"
 )
 
 // Config provides the configuration variables read from config.json
@@ -51,7 +52,7 @@ func Load() {
 		return
 	}
 
-	b, err := ioutil.ReadAll(file)
+	b, err := io.ReadAll(file)
 	if err != nil {
 		log.Println(err)
 		return

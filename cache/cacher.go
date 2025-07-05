@@ -2,7 +2,6 @@ package cache
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -98,7 +97,7 @@ func (c *cacher) save() *os.File {
 		return nil
 	}
 
-	buf, err := ioutil.ReadAll(down)
+	buf, err := io.ReadAll(down)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -151,9 +150,9 @@ func (c *cacher) createDir() {
 	}
 }
 
-func (c *cacher) readDir() []os.FileInfo {
+func (c *cacher) readDir() []os.DirEntry {
 	c.createDir()
-	srcDir, err := ioutil.ReadDir(c.platformDir())
+	srcDir, err := os.ReadDir(c.platformDir())
 	if err != nil {
 		log.Fatal(err)
 	}

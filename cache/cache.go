@@ -4,8 +4,9 @@ import (
 	"log"
 	"os"
 
-	"bitbucket.org/djr2/tldr/platform"
 	"github.com/mitchellh/go-homedir"
+
+	"bitbucket.org/djr2/tldr/platform"
 )
 
 var cacheDir string

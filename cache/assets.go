@@ -3,7 +3,6 @@ package cache
 import (
 	"archive/zip"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,7 +23,7 @@ func getAssets() { // nolint: gocyclo
 	page := pages.Pages{}
 	resp := page.Zip()
 
-	contents, err := ioutil.ReadAll(resp)
+	contents, err := io.ReadAll(resp)
 	if err != nil {
 		log.Fatal(err)
 	}
