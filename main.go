@@ -105,7 +105,7 @@ func tldr() {
 		return
 	}
 
-	if len(args) > 0 && cmd != "" {
+	if cmd != "" {
 		page.New(cache.Find(cmd, language, platform)).Print()
 		return
 	}
@@ -120,6 +120,7 @@ func getCmdArgs() (string, []string) {
 
 	var lastHyphen int = -1
 	for i, p := range os.Args[1:] {
+		// println(p)
 		if strings.HasPrefix(p, "--") {
 			lastHyphen = i
 			args = append(args, p)
@@ -133,7 +134,7 @@ func getCmdArgs() (string, []string) {
 			lastHyphen = -1
 		}
 	}
-
+	// println(strings.Join(cmds, "-"))
 	cmd = strings.Join(cmds, "-")
 	return cmd, args
 }
