@@ -17,6 +17,7 @@ var flagSet *getopt.FlagSet
 
 var flagClear bool
 var flagPageClear string
+var flagUpdate bool
 var flagPlatform string
 var flagPlatforms bool
 var flagLanguage string
@@ -30,6 +31,9 @@ func init() {
 
 	flagSet.StringVar(&flagPageClear, "c", "", "Clear cache for a specific tldr `page`.\n"+
 		"\t-p is required if clearing cache for a specific platform.")
+
+	flagSet.BoolVar(&flagUpdate, "u", false, "Update the local page cache.")
+	flagSet.Alias("u", "update")
 
 	flagSet.StringVar(&flagPlatform, "p", "", "Platform of the desired tldr page.")
 	flagSet.Alias("p", "platform")
@@ -77,13 +81,13 @@ func tldr() {
 		return
 	}
 
-	if flagPlatforms {
-		platform.Print()
+	if flagVersion {
+		version()
 		return
 	}
 
-	if flagVersion {
-		version()
+	if flagPlatforms {
+		platform.Print()
 		return
 	}
 
@@ -93,15 +97,22 @@ func tldr() {
 		language = config.Config.Language
 	}
 
+	if flagUpdate {
+		banner()
+		cache.Remove("clearall", language, platform, false)
+		cache.Create()
+		return
+	}
+
 	if flagClear {
 		banner()
-		cache.Remove("clearall", language, platform)
+		cache.Remove("clearall", language, platform, true)
 		return
 	}
 
 	if flagPageClear != "" {
 		banner()
-		cache.Remove(flagPageClear, language, platform)
+		cache.Remove(flagPageClear, language, platform, true)
 		return
 	}
 

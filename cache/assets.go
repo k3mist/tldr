@@ -85,4 +85,6 @@ func getAssets() { // nolint: gocyclo
 			log.Println(err)
 		}
 	}
+
+	log.Println("Cache updated")
 }

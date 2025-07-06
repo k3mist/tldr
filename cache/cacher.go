@@ -133,13 +133,16 @@ func (c *cacher) save() *os.File {
 	return c.search()
 }
 
-func (c *cacher) remove() {
-	if c.name == "clearall.md" {
+func (c *cacher) remove(exit bool) {
+	if strings.HasPrefix(c.name, "clearall") {
 		if err := os.RemoveAll(cacheDir); err != nil {
 			log.Fatal(err)
 		}
 		log.Println("Cache cleared")
-		os.Exit(0)
+		if exit {
+			os.Exit(0)
+		}
+		return
 	}
 
 	if c.search() == nil {
@@ -157,7 +160,7 @@ func (c *cacher) remove() {
 func (c *cacher) createDir() {
 	_, err := os.Stat(c.platformDir())
 	if err != nil {
-		if err := os.Mkdir(c.platformDir(), 0700); err != nil {
+		if err := os.MkdirAll(c.platformDir(), 0700); err != nil {
 			log.Fatal(err)
 		}
 	}

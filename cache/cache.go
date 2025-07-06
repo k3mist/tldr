@@ -12,7 +12,8 @@ import (
 var configDir string
 var cacheDir string
 
-func init() {
+// Create local cache assets
+func Create() {
 	h, err := homedir.Dir()
 	if err != nil {
 		log.Fatal(err)
@@ -21,19 +22,17 @@ func init() {
 	configDir = h + "/" + ".tldr"
 	cacheDir = configDir + "/cache"
 
-	if _, err := os.Stat(configDir); err != nil {
-		if err := os.Mkdir(configDir, 0700); err != nil {
-			log.Fatal(err)
-		}
-	}
-
 	if _, err := os.Stat(cacheDir); err != nil {
-		if err := os.Mkdir(cacheDir, 0700); err != nil {
+		if err := os.MkdirAll(cacheDir, 0700); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	getAssets()
+}
+
+func init() {
+	Create()
 }
 
 func newCacher(name string, lang string, plat platform.Platform) *cacher {
@@ -57,7 +56,7 @@ func Find(name string, lang string, plat platform.Platform) (*os.File, string, p
 
 // Remove will delete a local tldr page from the cache or if `clearall` is
 // provided as the name it will remove all tldr pages from the cache.
-func Remove(name string, lang string, plat platform.Platform) {
+func Remove(name string, lang string, plat platform.Platform, exit bool) {
 	cacher := newCacher(name, lang, getPlatform(plat))
-	cacher.remove()
+	cacher.remove(exit)
 }
