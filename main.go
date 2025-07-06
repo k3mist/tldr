@@ -105,9 +105,12 @@ func tldr() {
 		return
 	}
 
-	if len(os.Args[1:]) > 0 {
+	if len(args) > 0 && cmd != "" {
 		page.New(cache.Find(cmd, language, platform)).Print()
+		return
 	}
+
+	usage()
 }
 
 func getCmdArgs() (string, []string) {
