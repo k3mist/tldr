@@ -113,26 +113,27 @@ func tldr() {
 func getCmdArgs() (string, []string) {
 	var cmd string
 	var args []string
-
 	var cmds []string
+
 	var lastHyphen int = -1
 	for i, p := range os.Args[1:] {
-		if lastHyphen < 0 && !strings.HasPrefix(p, "-") {
+		if strings.HasPrefix(p, "--") {
+			lastHyphen = i
+			args = append(args, p)
+		} else if strings.HasPrefix(p, "-") {
+			lastHyphen = i
+			args = append(args, p)
+			args = append(args, os.Args[(i+1)+1])
+		} else if lastHyphen < 0 {
 			cmds = append(cmds, p)
 		} else {
-			lastHyphen = i
+			lastHyphen = -1
 		}
 	}
 
 	cmd = strings.Join(cmds, "-")
 	if cmd == "" && strings.HasPrefix(os.Args[1], "-") {
 		cmd = os.Args[1]
-	}
-
-	if strings.HasPrefix(cmd, "-") {
-		args = os.Args[1:]
-	} else {
-		args = os.Args[2:]
 	}
 
 	return cmd, args

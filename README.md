@@ -115,6 +115,16 @@ or
 tldr -c clearall
 ```
 
+### Usage Notes
+
+CLI arguments may be provided in any order.
+
+For example;
+```
+tldr -p windows cd -L it
+tldr -L es tar
+```
+
 ## Configuration
 
 A configuration is created the first time `tldr` is run.
