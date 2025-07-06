@@ -4,4 +4,4 @@ go 1.24.4
 
 require github.com/mitchellh/go-homedir v1.1.0
 
-require github.com/rsc/getopt v0.0.0-20170811000552-20be20937449 // indirect
+require rsc.io/getopt v0.0.0-20170811000552-20be20937449 // indirect

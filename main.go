@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rsc/getopt"
+	"rsc.io/getopt"
 
 	"bitbucket.org/djr2/tldr/cache"
 	"bitbucket.org/djr2/tldr/config"
