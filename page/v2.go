@@ -2,7 +2,6 @@ package page
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
 
 	"bitbucket.org/djr2/tldr/color"
@@ -33,7 +32,7 @@ func (p *pagev2) Write(b []byte) {
 }
 
 func (p *pagev2) Print() {
-	fmt.Println(p.buf.String() + color.Reset)
+	printBuffer(*p.buf)
 }
 
 func (p *pagev2) Header() []byte {

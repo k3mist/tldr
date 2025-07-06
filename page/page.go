@@ -2,6 +2,7 @@ package page
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -15,6 +16,10 @@ import (
 // Page provides the Print method for the final generated output of a TLDR page.
 type Page interface {
 	Print()
+}
+
+func printBuffer(buf bytes.Buffer) {
+	fmt.Println(buf.String() + color.Reset)
 }
 
 // Parser provides the interface for parsing a TLDR page.
