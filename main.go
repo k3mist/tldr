@@ -112,8 +112,8 @@ func tldr() {
 
 func getCmdArgs() (string, []string) {
 	var cmd string
-	var args []string
 	var cmds []string
+	var args []string
 
 	var lastHyphen int = -1
 	for i, p := range os.Args[1:] {
@@ -132,9 +132,5 @@ func getCmdArgs() (string, []string) {
 	}
 
 	cmd = strings.Join(cmds, "-")
-	if cmd == "" && strings.HasPrefix(os.Args[1], "-") {
-		cmd = os.Args[1]
-	}
-
 	return cmd, args
 }
