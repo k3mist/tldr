@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"bitbucket.org/djr2/tldr/pages"
 )
 
 func getAssets() { // nolint: gocyclo
@@ -20,7 +18,7 @@ func getAssets() { // nolint: gocyclo
 		}
 	}
 
-	page := pages.Pages{}
+	page := Pages{}
 	resp := page.Zip()
 
 	contents, err := io.ReadAll(resp)

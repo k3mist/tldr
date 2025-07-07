@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"bitbucket.org/djr2/tldr/config"
-	"bitbucket.org/djr2/tldr/pages"
 	"bitbucket.org/djr2/tldr/platform"
 )
 
@@ -33,7 +32,7 @@ func (c *cacher) cmd() string {
 
 func (c *cacher) search() *os.File {
 	var tried []platform.Platform
-	c.plat = getPlatform(c.plat)
+	c.plat = platform.GetPlatform(c.plat)
 	tried = append(tried, c.plat)
 
 	cached := c.find()
@@ -71,7 +70,7 @@ func (c *cacher) search() *os.File {
 
 func (c *cacher) extendedSearch(tried []platform.Platform) *os.File {
 	for _, plat := range platform.Platforms() {
-		c.plat = getPlatform(platform.Parse(plat))
+		c.plat = platform.GetPlatform(platform.Parse(plat))
 		if file := c.find(); file != nil {
 			return file
 		}
@@ -101,7 +100,7 @@ func (c *cacher) find() *os.File {
 }
 
 func (c *cacher) download() io.ReadCloser {
-	page := pages.New(c.name, c.lang, c.plat)
+	page := NewPage(c.name, c.lang, c.plat)
 	c.plat = page.Platform
 	c.createDir()
 	return page.Body()

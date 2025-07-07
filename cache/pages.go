@@ -1,4 +1,4 @@
-package pages
+package cache
 
 import (
 	"io"
@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	zip = "https://tldr-pages.github.io/assets/tldr.zip"
-	raw = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/"
+	zipUri = "https://tldr-pages.github.io/assets/tldr.zip"
+	rawUri = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/"
 )
 
 // Pages provides the retrieval of the TLDR assets and repository pages.
@@ -23,8 +23,8 @@ type Pages struct {
 	cfg      config.Options
 }
 
-// New creates a new Pages instance
-func New(name string, lang string, plat platform.Platform) *Pages {
+// NewPage creates a new Pages instance
+func NewPage(name string, lang string, plat platform.Platform) *Pages {
 	return &Pages{
 		Name:     name,
 		Lang:     lang,
@@ -38,7 +38,7 @@ func (p *Pages) url() string {
 	if p.cfg.PagesURI != "" {
 		uri = p.cfg.PagesURI
 	} else {
-		uri = raw
+		uri = rawUri
 	}
 
 	uri = strings.TrimSuffix(uri, "/")
@@ -52,14 +52,14 @@ func (p *Pages) Zip() io.ReadCloser {
 	if p.cfg.ZipURI != "" {
 		uri = p.cfg.ZipURI
 	} else {
-		uri = zip
+		uri = zipUri
 	}
 	zpr, err := http.Get(uri)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if zpr.StatusCode != http.StatusOK {
-		log.Fatal("Problem getting: ", zip, " Server Error: ", zpr.StatusCode)
+		log.Fatal("Problem getting: ", zipUri, " Server Error: ", zpr.StatusCode)
 	}
 	return zpr.Body
 }

@@ -49,6 +49,14 @@ var platformMap = map[Platform]string{
 	SUNOS:   `sunos`,
 }
 
+// Get the platform
+func GetPlatform(plat Platform) Platform {
+	if plat == UNKNOWN {
+		return Actual()
+	}
+	return plat
+}
+
 // String provides the string based representation of the Platform
 func (p Platform) String() string {
 	if name, ok := platformMap[p]; ok {

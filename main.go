@@ -131,21 +131,22 @@ func getCmdArgs() (string, []string) {
 
 	var lastHyphen int = -1
 	for i, p := range os.Args[1:] {
-		// println(p)
 		if strings.HasPrefix(p, "--") {
 			lastHyphen = i
 			args = append(args, p)
 		} else if strings.HasPrefix(p, "-") {
 			lastHyphen = i
 			args = append(args, p)
-			args = append(args, os.Args[(i+1)+1])
+			if len(os.Args[1:]) > 1 {
+				args = append(args, os.Args[(i+1)+1])
+			}
 		} else if lastHyphen < 0 {
 			cmds = append(cmds, p)
 		} else {
 			lastHyphen = -1
 		}
 	}
-	// println(strings.Join(cmds, "-"))
+
 	cmd = strings.Join(cmds, "-")
 	return cmd, args
 }
