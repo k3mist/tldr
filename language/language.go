@@ -9,15 +9,8 @@ import (
 )
 
 var lang []string
-var configLang string
-var envLang string
-var envLang2 string
 
 func init() {
-	configLang = config.Config.Language
-	envLang = os.Getenv("LANG")
-	envLang2 = os.Getenv("LANGUAGE")
-
 	lang = setLang()
 	if len(lang) == 0 {
 		lang = append(lang, "en")
@@ -28,29 +21,29 @@ func GetLanguage(which int) string {
 	return lang[which]
 }
 
-func GetLanguages(which int) []string {
+func GetLanguages() []string {
 	return lang
 }
 
-func HasLanguage(language string) bool {
-	return slices.Contains(lang, language)
+func HasLanguage(which string) bool {
+	return slices.Contains(lang, which)
 }
 
 func setLang() []string {
 	var list []string
 
-	if configLang != "" {
-		list = append(list, parseLang(configLang)...)
+	if config.Config.Language != "" {
+		list = append(list, parseLang(config.Config.Language)...)
 		return list
 	}
 
-	if envLang != "" {
-		list = append(list, parseLang(envLang)...)
+	if os.Getenv("LANG") != "" {
+		list = append(list, parseLang(os.Getenv("LANG"))...)
 		return list
 	}
 
-	if envLang2 != "" {
-		list = append(list, parseLang(envLang2)...)
+	if os.Getenv("LANGUAGE") != "" {
+		list = append(list, parseLang(os.Getenv("LANGUAGE"))...)
 		return list
 	}
 
@@ -62,7 +55,7 @@ var keepSuffix []string = []string{"BR", "PT", "TW"}
 func findSuffix(locale []string) string {
 	var found string
 	for _, s := range keepSuffix {
-		if locale[1] == s {
+		if len(locale) == 2 && locale[1] == s {
 			found = strings.Join(locale, "_")
 			return found
 		} else {
