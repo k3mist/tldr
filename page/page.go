@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/djr2/tldr/color"
 	"bitbucket.org/djr2/tldr/config"
+	"bitbucket.org/djr2/tldr/language"
 	"bitbucket.org/djr2/tldr/platform"
 )
 
@@ -77,7 +78,7 @@ func Parse(p Parser, lang string, plat platform.Platform) {
 				p.Write(toB(color.Color(cfg.PlatformAltColor) + plat.String()))
 			}
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + ":"))
-			if lang == config.Config.Language {
+			if language.HasLanguage(lang) {
 				p.Write(toB(color.Color(cfg.PlatformColor) + lang))
 			} else {
 				p.Write(toB(color.Color(cfg.PlatformAltColor) + lang))

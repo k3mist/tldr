@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/djr2/tldr/cache"
 	"bitbucket.org/djr2/tldr/config"
+	"bitbucket.org/djr2/tldr/language"
 	"bitbucket.org/djr2/tldr/page"
 	"bitbucket.org/djr2/tldr/platform"
 )
@@ -92,32 +93,32 @@ func tldr() {
 	}
 
 	platform := platform.ParseFlag(flagPlatform)
-	var language string = flagLanguage
-	if language == "" {
-		language = config.Config.Language
+	var lang string = flagLanguage
+	if lang == "" {
+		lang = language.GetLanguage(0)
 	}
 
 	if flagUpdate {
 		banner()
-		cache.Remove("clearall", language, platform, false)
+		cache.Remove("clearall", lang, platform, false)
 		cache.Create()
 		return
 	}
 
 	if flagClear {
 		banner()
-		cache.Remove("clearall", language, platform, true)
+		cache.Remove("clearall", lang, platform, true)
 		return
 	}
 
 	if flagPageClear != "" {
 		banner()
-		cache.Remove(flagPageClear, language, platform, true)
+		cache.Remove(flagPageClear, lang, platform, true)
 		return
 	}
 
 	if cmd != "" {
-		page.New(cache.Find(cmd, language, platform)).Print()
+		page.New(cache.Find(cmd, lang, platform)).Print()
 		return
 	}
 

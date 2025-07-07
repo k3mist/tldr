@@ -70,7 +70,7 @@ func create(f string) {
 	vars := Options{
 		PagesURI:         "",
 		ZipURI:           "",
-		Language:         "en",
+		Language:         "",
 		CacheExpiration:  30,
 		BannerColor1:     color.Cyan,
 		BannerColor2:     color.Blue,
