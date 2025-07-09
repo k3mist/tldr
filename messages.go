@@ -34,7 +34,7 @@ func noTldr(cmd string) {
 
 func noLookup(cmd string, lang string, plat platform.Platform) {
 	cfg := config.Config
-	if cfg.LookupWarnings {
+	if cfg.LookupWarnings || flagWarn {
 		fmt.Print(color.Color(cfg.DescriptionColor) + "> No tldr for ")
 		fmt.Print(color.Color(cfg.HeaderDecorColor) + "[")
 		fmt.Print(color.ColorBold(cfg.HeaderColor) + cmd)

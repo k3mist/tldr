@@ -61,7 +61,7 @@ Usage:
         Clear the entire page cache.
   --debug string
         Enables debug logging. (default "disable")
-  -g, --get
+  --get
         If a tldr page is not cached attempt to retrieve it.
   --help
         This usage output.

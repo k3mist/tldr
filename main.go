@@ -23,7 +23,6 @@ var flagPlatform string
 var flagPlatforms bool
 var flagLanguage string
 var flagGet bool
-var flagExtended bool
 var flagWarn bool
 var flagVersion bool
 var flagHelp bool
@@ -49,14 +48,9 @@ func init() {
 
 	flagSet.BoolVar(&flagVersion, "version", false, "Display the version number.")
 
-	flagSet.BoolVar(&flagGet, "g", false, "If a tldr page is not cached attempt to retrieve it.")
-	flagSet.Alias("g", "get")
+	flagSet.BoolVar(&flagGet, "get", false, "If a tldr page is not cached attempt to retrieve it.")
 
-	// flagSet.BoolVar(&flagExtended, "e", false, "Perform an extended search. (default: on via config)")
-	// flagSet.Alias("e", "extended")
-
-	// flagSet.BoolVar(&flagWarn, "w", false, "Show search warnings when page, language, platform combination is not found.")
-	// flagSet.Alias("w", "warn")
+	flagSet.BoolVar(&flagWarn, "warn", false, "Show search warnings when page, language, platform combination is not found.")
 
 	flagSet.BoolVar(&flagHelp, "help", false, "This usage output.")
 
