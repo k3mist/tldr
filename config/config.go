@@ -20,6 +20,8 @@ type Options struct {
 	ZipURI           string `json:"zip_uri"`
 	Language         string `json:"language"`
 	CacheExpiration  int    `json:"cache_expiration"`
+	ExtendedSearch   bool   `json:"extended_search"`
+	LookupWarnings   bool   `json:"lookup_warnings"`
 	BannerColor1     int    `json:"banner_color_1"`
 	BannerColor2     int    `json:"banner_color_2"`
 	TLDRColor        int    `json:"tldr_color"`
@@ -72,6 +74,8 @@ func create(f string) {
 		ZipURI:           "",
 		Language:         "",
 		CacheExpiration:  30,
+		ExtendedSearch:   true,
+		LookupWarnings:   false,
 		BannerColor1:     color.Cyan,
 		BannerColor2:     color.Blue,
 		TLDRColor:        color.White,

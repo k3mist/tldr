@@ -78,7 +78,7 @@ func Parse(p Parser, lang string, plat platform.Platform) {
 				p.Write(toB(color.Color(cfg.PlatformAltColor) + plat.String()))
 			}
 			p.Write(toB(color.ColorBold(cfg.HeaderDecorColor) + ":"))
-			if language.HasLanguage(lang) {
+			if language.GetLanguage(0) == lang {
 				p.Write(toB(color.Color(cfg.PlatformColor) + lang))
 			} else {
 				p.Write(toB(color.Color(cfg.PlatformAltColor) + lang))

@@ -61,12 +61,16 @@ Usage:
         Clear the entire page cache.
   --debug string
         Enables debug logging. (default "disable")
+  -g, --get
+        If a tldr page is not cached attempt to retrieve it.
   --help
         This usage output.
   -p, --platform string
         Platform of the desired tldr page.
   --platforms
         Display a list of available platforms.
+  -u, --update
+        Update the local page cache.
   --version
         Display the version number.
 ```
@@ -143,8 +147,10 @@ Below is the default configuration.
 {
 "pages_uri": "",
 "zip_uri": "",
-"language": "en",
+"language": "",
 "cache_expiration": 30,
+"extended_search": true,
+"lookup_warnings": false,
 "banner_color_1": 36,
 "banner_color_2": 34,
 "tldr_color": 97,
@@ -154,7 +160,7 @@ Below is the default configuration.
 "platform_alt_color": 95,
 "description_color": 0,
 "example_color": 36,
-"hypen_color": 0,
+"hyphen_color": 0,
 "syntax_color": 31,
 "variable_color": 0
 }

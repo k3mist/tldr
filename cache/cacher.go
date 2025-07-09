@@ -16,6 +16,7 @@ type cacher struct {
 	plat platform.Platform
 	lang string
 	name string
+	get  bool
 }
 
 func (c *cacher) platformDir() string {
@@ -42,7 +43,7 @@ func (c *cacher) search() *os.File {
 	}
 
 	cached = c.find()
-	if cached == nil {
+	if cached == nil && config.Config.ExtendedSearch {
 		cached = c.extendedSearch(tried)
 	}
 
@@ -76,10 +77,12 @@ func (c *cacher) extendedSearch(tried []platform.Platform) *os.File {
 		}
 	}
 
-	for _, plat := range tried {
-		c.plat = plat
-		if file := c.save(); file != nil {
-			return file
+	if c.get {
+		for _, plat := range tried {
+			c.plat = plat
+			if file := c.save(); file != nil {
+				return file
+			}
 		}
 	}
 

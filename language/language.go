@@ -8,46 +8,39 @@ import (
 	"bitbucket.org/djr2/tldr/config"
 )
 
-var lang []string
+var languages []string
 
-func init() {
-	lang = setLang()
-	if len(lang) == 0 {
-		lang = append(lang, "en")
-	}
-}
-
+// Get a language by index
 func GetLanguage(which int) string {
-	return lang[which]
+	return languages[which]
 }
 
+// Get all languages
 func GetLanguages() []string {
-	return lang
+	return languages
 }
 
+// Check if a language exists
 func HasLanguage(which string) bool {
-	return slices.Contains(lang, which)
+	return slices.Contains(languages, which)
 }
 
-func setLang() []string {
+// Set the languages
+func SetLang() {
 	var list []string
 
 	if config.Config.Language != "" {
 		list = append(list, parseLang(config.Config.Language)...)
-		return list
-	}
-
-	if os.Getenv("LANG") != "" {
+	} else if os.Getenv("LANG") != "" {
 		list = append(list, parseLang(os.Getenv("LANG"))...)
-		return list
-	}
-
-	if os.Getenv("LANGUAGE") != "" {
+	} else if os.Getenv("LANGUAGE") != "" {
 		list = append(list, parseLang(os.Getenv("LANGUAGE"))...)
-		return list
 	}
 
-	return list
+	languages = list
+	if len(languages) == 0 || !slices.Contains(languages, "en") {
+		languages = append(languages, "en")
+	}
 }
 
 var keepSuffix []string = []string{"BR", "PT", "TW"}

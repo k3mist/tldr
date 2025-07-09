@@ -22,6 +22,9 @@ var flagUpdate bool
 var flagPlatform string
 var flagPlatforms bool
 var flagLanguage string
+var flagGet bool
+var flagExtended bool
+var flagWarn bool
 var flagVersion bool
 var flagHelp bool
 
@@ -41,11 +44,19 @@ func init() {
 
 	flagSet.BoolVar(&flagPlatforms, "platforms", false, "Display a list of available platforms.")
 
-	// TODO add language support
 	flagSet.StringVar(&flagLanguage, "L", "", "The desired language for the tldr page.")
 	flagSet.Alias("L", "language")
 
 	flagSet.BoolVar(&flagVersion, "version", false, "Display the version number.")
+
+	flagSet.BoolVar(&flagGet, "g", false, "If a tldr page is not cached attempt to retrieve it.")
+	flagSet.Alias("g", "get")
+
+	// flagSet.BoolVar(&flagExtended, "e", false, "Perform an extended search. (default: on via config)")
+	// flagSet.Alias("e", "extended")
+
+	// flagSet.BoolVar(&flagWarn, "w", false, "Show search warnings when page, language, platform combination is not found.")
+	// flagSet.Alias("w", "warn")
 
 	flagSet.BoolVar(&flagHelp, "help", false, "This usage output.")
 
@@ -60,6 +71,7 @@ func usage() {
 
 func main() {
 	config.Load()
+	language.SetLang()
 
 	if len(os.Args[1:]) == 0 {
 		usage()
@@ -92,7 +104,8 @@ func tldr() {
 		return
 	}
 
-	platform := platform.ParseFlag(flagPlatform)
+	plat := platform.ParseFlag(flagPlatform)
+
 	var lang string = flagLanguage
 	if lang == "" {
 		lang = language.GetLanguage(0)
@@ -100,25 +113,53 @@ func tldr() {
 
 	if flagUpdate {
 		banner()
-		cache.Remove("clearall", lang, platform, false)
+		cache.Remove("clearall", lang, plat, false)
 		cache.Create()
 		return
 	}
 
 	if flagClear {
 		banner()
-		cache.Remove("clearall", lang, platform, true)
+		cache.Remove("clearall", lang, plat, true)
 		return
 	}
 
 	if flagPageClear != "" {
 		banner()
-		cache.Remove(flagPageClear, lang, platform, true)
+		cache.Remove(flagPageClear, lang, plat, true)
 		return
 	}
 
+	getTldr(cmd, lang, plat)
+}
+
+func getTldr(cmd string, lang string, plat platform.Platform) {
 	if cmd != "" {
-		page.New(cache.Find(cmd, lang, platform)).Print()
+		var lfile *os.File
+		var llang string
+		var lplat platform.Platform
+
+		lfile, llang, lplat = cache.Find(cmd, lang, plat, flagGet)
+		if lfile == nil {
+			noLookup(cmd, lang, plat)
+			for _, l := range language.GetLanguages() {
+				if l != lang {
+					lfile, llang, lplat = cache.Find(cmd, l, plat, flagGet)
+				}
+				if lfile != nil {
+					break
+				} else {
+					noLookup(cmd, llang, lplat)
+				}
+			}
+		}
+
+		if lfile != nil {
+			page.New(lfile, llang, lplat).Print()
+		} else {
+			noTldr(cmd)
+		}
+
 		return
 	}
 

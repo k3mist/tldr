@@ -78,7 +78,7 @@ func Parse(p string) Platform {
 			return plat
 		}
 	}
-	return UNKNOWN
+	return Actual()
 }
 
 // Platforms returns the string array of the available Platforms.
@@ -87,8 +87,9 @@ func Platforms() []string {
 	for _, name := range platformMap {
 		if name == `unknown` {
 			continue
+		} else {
+			platforms = append(platforms, name)
 		}
-		platforms = append(platforms, name)
 	}
 	return platforms
 }
