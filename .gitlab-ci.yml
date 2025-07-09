@@ -12,7 +12,6 @@ image: golang:latest
 stages:
   - test
   - build
-#  - deploy
 
 format:
   stage: test
@@ -29,8 +28,3 @@ compile:
   artifacts:
     paths:
       - ./build
-
-deploy:
-  stage: deploy
-  script: echo "Define your deployment script!"
-  environment: production
