@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	zipUri = "https://tldr-pages.github.io/assets/tldr.zip"
+	zipUri = "https://github.com/tldr-pages/tldr/releases/latest/download/tldr.zip"
 	rawUri = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/"
 )
 
