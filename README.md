@@ -177,7 +177,7 @@ and file specification.
 
 Pages: `https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/`
 
-Zip: `https://tldr-pages.github.io/assets/tldr.zip`
+Zip: `https://github.com/tldr-pages/tldr/releases/latest/download/tldr.zip`
 
 To reset the configuration back to its defaults delete `config.json`
 and it will be recreated. Or copy and paste the configuration from
