@@ -43,10 +43,11 @@ var (
 // parsed TLDR page.
 func New(file *os.File, lang string, plat platform.Platform) Page { // nolint: interfacer
 	b, err := io.ReadAll(file)
-	defer file.Close() // nolint: errcheck
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
+
 	lines := bytes.Split(b, toB("\n"))
 	if headerRxV2.Match(lines[1]) {
 		p := &pagev2{lines, &bytes.Buffer{}}

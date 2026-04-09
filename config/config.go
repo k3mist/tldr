@@ -45,17 +45,16 @@ func Load() {
 	}
 
 	f := h + "/" + ".tldr/config.json"
-	_, err = os.Stat(f)
-	if err != nil {
+	if _, err := os.Stat(f); err != nil {
 		create(f)
 	}
 
 	file, err := os.Open(f)
-	defer file.Close() // nolint: errcheck, megacheck
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer file.Close()
 
 	b, err := io.ReadAll(file)
 	if err != nil {
@@ -63,7 +62,7 @@ func Load() {
 		return
 	}
 
-	if json.Unmarshal(b, &Config) != nil {
+	if err := json.Unmarshal(b, &Config); err != nil {
 		log.Println(err)
 	}
 }
@@ -91,18 +90,17 @@ func create(f string) {
 	}
 
 	file, err := os.Create(f)
-	defer file.Close() // nolint: errcheck, megacheck
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
 	j, err := json.MarshalIndent(vars, "", "")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = file.Write(j)
-	if err != nil {
+	if _, err := file.Write(j); err != nil {
 		log.Fatal(err)
 	}
 }

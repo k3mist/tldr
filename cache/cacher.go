@@ -124,14 +124,13 @@ func (c *cacher) save() *os.File {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
-	ret, err := file.Write(buf)
-	defer file.Close() // nolint: errcheck
-	if err != nil {
+	if _, err := file.Write(buf); err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(ret))
+	log.Println("Created:", c.file(), "bytes:", strconv.Itoa(len(buf)))
 	return c.search()
 }
 

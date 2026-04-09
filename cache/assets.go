@@ -32,16 +32,16 @@ func getAssets() { // nolint: gocyclo
 	}
 
 	_, err = file.Write(contents)
-	defer file.Close() // nolint: errcheck
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
 	r, err := zip.OpenReader(zipFile)
-	defer r.Close() // nolint: errcheck, megacheck
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer r.Close()
 
 	for _, f := range r.File {
 		df, oerr := f.Open()
