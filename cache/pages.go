@@ -43,7 +43,11 @@ func (p *Pages) url() string {
 
 	uri = strings.TrimSuffix(uri, "/")
 
-	return uri + "." + p.Lang + "/" + p.Platform.String() + "/" + p.Name
+	if p.Lang != "en" {
+		uri += "." + p.Lang
+	}
+
+	return uri + "/" + p.Platform.String() + "/" + p.Name
 }
 
 // Zip returns the result of the downloaded TLDR pages zip file.
